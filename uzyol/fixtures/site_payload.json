@@ -1,0 +1,116 @@
+{
+  "brand": {
+    "name": "Oʻzyoʻlkoʻprik",
+    "legalName": "“Oʻzyoʻlkoʻprik” klasteri davlat muassasasi",
+    "tagline": "Koʻprik va sunʼiy inshootlar uchun loyihalash, ishlab chiqarish, taʼmirlash va diagnostika ishlari"
+  },
+  "assets": {
+    "logo": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 200 200\" fill=\"none\"><rect width=\"200\" height=\"200\" rx=\"40\" fill=\"%230E1726\"/><path d=\"M40 130 C 70 60, 130 60, 160 130\" stroke=\"%2306B6D4\" stroke-width=\"14\" stroke-linecap=\"round\"/><path d=\"M55 125 C 80 80, 120 80, 145 125\" stroke=\"%23F59E0B\" stroke-width=\"8\"/><path d=\"M30 145 Q 100 120 170 145\" stroke=\"%230F766E\" stroke-width=\"12\" stroke-linecap=\"round\"/><path d=\"M100 73 V 127 M75 88 V 125 M125 88 V 125\" stroke=\"%2306B6D4\" stroke-width=\"4\" stroke-dasharray=\"4 4\"/></svg>",
+    "hero": "/media/plant_hero.png",
+    "plant": "/media/plant_hero.png",
+    "contact": "/media/plant_hero.png",
+    "leaders": [
+      "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\" fill=\"none\"><rect width=\"400\" height=\"400\" fill=\"%230E1726\"/><circle cx=\"200\" cy=\"140\" r=\"60\" fill=\"%2306B6D4\" opacity=\"0.4\"/><path d=\"M100 340 C 100 240, 300 240, 300 340\" fill=\"%230F766E\" opacity=\"0.6\"/><text x=\"200\" y=\"380\" fill=\"%23F8FAFC\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"bold\" text-anchor=\"middle\">Raxbar</text></svg>",
+      "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 400 400\" fill=\"none\"><rect width=\"400\" height=\"400\" fill=\"%230E1726\"/><circle cx=\"200\" cy=\"140\" r=\"60\" fill=\"%23F59E0B\" opacity=\"0.4\"/><path d=\"M100 340 C 100 240, 300 240, 300 340\" fill=\"%233B82F6\" opacity=\"0.6\"/><text x=\"200\" y=\"380\" fill=\"%23F8FAFC\" font-family=\"sans-serif\" font-size=\"18\" font-weight=\"bold\" text-anchor=\"middle\">Bosh Muhandis</text></svg>"
+    ]
+  },
+  "navigation": [
+    {"label": "Bosh sahifa", "slug": "bosh-sahifa"},
+    {
+      "label": "Korxona haqida",
+      "slug": "korxona-haqida",
+      "children": [
+        {"label": "Korxona ustavi", "slug": "korxona-ustavi"},
+        {"label": "Tashkiliy tuzilma", "slug": "tashkiliy-tuzilma"},
+        {"label": "Rahbariyat", "slug": "rahbariyat"}
+      ]
+    },
+    {
+      "label": "Zavod haqida",
+      "slug": "katalog",
+      "children": [
+        {"label": "Katalog", "slug": "katalog"},
+        {"label": "Nomenklatura", "slug": "nomenklatura"},
+        {"label": "Narx-navo", "slug": "narx-navo"},
+        {"label": "Boʻsh ish oʻrinlari", "slug": "bosh-ish-orinlari"}
+      ]
+    },
+    {"label": "Eʼlonlar", "slug": "elonlar"},
+    {"label": "Qayta aloqa", "slug": "qayta-aloqa"}
+  ],
+  "home": {
+    "intro": "Oʻzbekiston Respublikasi Prezidentining 330-sonli qarori asosida tashkil topgan davlat muassasasi bo'lib Respublika boʻyicha koʻprik qurilishiga ta'aluqli barcha ishlarni amalga oshiradi.",
+    "purpose": "Klasterning maqsadi – avtomobil yo‘llarida joylashgan ko‘prik va sun’iy inshootlarni ta’mirlash hamda texnik soz holatda saqlash maqsadida “loyihalash – tiklash – ekspluatatsiya qilish” ishlarini amalga oshirish hisoblanadi.",
+    "tasks": [
+      "avtomobil yo‘llarida qurish, qayta qurish, ta’mirlash va saqlash ishlarini amalga oshirish;",
+      "ko‘prik va sun’iy inshootlarni muntazam ravishda shartnoma asosida diagnostika qilish, pasportlashtirish va texnik ko‘rikdan o‘tkazib borish;",
+      "diagnostika qilish natijalariga asosan aniqlanadigan avariya holatidagi ta’mirtalab ko‘prik va sun’iy inshootlarni loyihalashtirish, ta’mirlash va tiklash ishlarini amalga oshirish;",
+      "ko‘prik va sun’iy inshootlarni ta’mirlash hamda tiklash uchun zarur bo‘ladigan materiallarni, jumladan temir-beton qurilmalari va jihozlarni ishlab chiqarish;",
+      "umumiy foydalanishdagi avtomobil yo‘llarida joylashgan ko‘prik va sun’iy inshootlarni texnik soz holatda saqlash;",
+      "zamonaviy texnika va texnologiyalarni qo‘llash orqali raqobatbardosh, sifatli mahsulotlar ishlab chiqarish va yetkazib berish;",
+      "temir-beton, tovar-beton va noruda mahsulotlarini ishlab chiqarish va sotish;",
+      "avtotransport, temir yo‘l transporti va boshqa transport vositalari bilan yuk tashish xizmatlarini ko‘rsatish;",
+      "o‘zi ishlab chiqargan mahsulotlarni o‘zaro tuzilgan shartnomalar asosida mulkchilik shaklidan qat’iy nazar korxona, tashkilotlarga va fuqarolarga sotish;",
+      "temir yo‘l xizmatlarini, shu jumladan temir yo‘l yuk hovlisi xizmatlarini ko‘rsatish;",
+      "avtomobil transportida yo‘lovchi tashish;",
+      "noruda mahsulotlarini qazib olish, qayta ishlash va sotish;"
+    ],
+    "capabilities": ["Loyihalash", "Temir-beton qurilmalarini ishlab chiqarish", "Ta'mirlash va tiklash", "Diagnostika ishlari"]
+  },
+  "contact": {
+    "phones": ["+998 55 515 16 16", "+998 95 144 68 50"],
+    "email": "ozyolkoprik@uzavtoyol.uz",
+    "bank": "Oʻzbekiston Respublikasi TIF Milliy bank Bektemir tumani filiali BIK 00450 STIR 200 836 188",
+    "address": "Toshkent shahri, Yashnobod tumani, Oʻrta Masjid MFY, Ohangrabo koʻchasi 12-uy 100146",
+    "hours": "09:00 dan 18:00 gacha",
+    "map": "https://maps-api-ssl.google.com/maps?hl=en-US&ll=41.25147,69.354269&output=embed&q=41.251234,69.354249"
+  },
+  "pages": [
+    {"slug": "bosh-sahifa", "title": "Bosh sahifa", "type": "home"},
+    {"slug": "korxona-haqida", "title": "Korxona haqida", "type": "empty", "status": "Maʼlumotlar shakllantirilmoqda."},
+    {"slug": "korxona-ustavi", "title": "Korxona ustavi", "type": "status", "status": "Ishlab chiqish bosqichida (На стадии разработки)."},
+    {"slug": "tashkiliy-tuzilma", "title": "Tashkiliy tuzilma", "type": "status", "status": "Ishlab chiqish bosqichida (На стадии разработки)."},
+    {
+      "slug": "rahbariyat",
+      "title": "Rahbariyat",
+      "type": "leaders",
+      "leaders": [
+        {"name": "Salayev Fahriddin Farxodovich", "position": "Bosh direktor", "born": "", "education": "", "imageIndex": null},
+        {"name": "Sharipov Shukurullo Murаdovich", "position": "Direktor oʻrinbosari - Bosh muhandis", "born": "09.02.1985 Buxoro viloyati, Buxoro shaxri", "education": "1. Toshkent avtomobil yo'llari instituti. 2. Toshkent Politexnika instituti", "imageIndex": 0},
+        {"name": "Abdullayev Avazbek Abdurozzoq oʻgʻli", "position": "Direktor oʻrinbosari", "born": "02.12.1992 Namangan viloyati, Toʻraqoʻrgʻon tumani", "education": "1. Namangan muhandislik-qurilish instituti. 2. Toshkent iqtisodiyot universiteti", "imageIndex": 1}
+      ]
+    },
+    {"slug": "katalog", "title": "Katalog", "type": "document", "document": "Каталог ver. 2.pdf"},
+    {"slug": "nomenklatura", "title": "Nomenklatura", "type": "document", "document": "Номенклатура PDF.pdf"},
+    {"slug": "narx-navo", "title": "Narx-navo", "type": "empty", "status": "Narx-navo maʼlumotlari shakllantirilmoqda."},
+    {"slug": "bosh-ish-orinlari", "title": "Boʻsh ish oʻrinlari", "type": "status", "status": "Ishlab chiqish bosqichida (На стадии разработки)."},
+    {
+      "slug": "elonlar",
+      "title": "Eʼlonlar",
+      "type": "announcement",
+      "intro": "«Узйулкуприк кластер ДМ» объявляет конкурсный торг на поставку нижеприведённого оборудования:",
+      "items": [
+        "Кран козловой КС-100 т – 2 шт",
+        "Кран мостовой 20/5т – 2 шт",
+        "Кран козловой 30т – 2 шт",
+        "Токарно-винторезный станок 16к20 – 2 шт",
+        "Гильотина QC12K 30*2500 – 1 шт",
+        "Машина для стыковой сварки МСМУ-150 – 2 шт",
+        "Радиально сверлильный станок 2м55 – 2 шт",
+        "Разрывная машина УММ-5 – 1 шт",
+        "Фрезерный станок 6Т82Г-1 – 2 шт",
+        "Кузнечный молот 10т – 1 шт",
+        "Домкрат гидравлический СМЖ - 738А – 4 шт",
+        "Ножницы для резки металла СМЦ-172 – 1 шт",
+        "Волоконной лазерный резак MetalTec 1530 – 1 шт",
+        "Станок для гиба металла Durma AD-R 2060 – 1 шт",
+        "Пресс ножницы комбинированные гидравлические НГ2222 – 1 шт",
+        "Машина контактной точечной сварки МТП – 75 – 2 шт",
+        "Станок для вальцевания металла 10*2000, серия W11F – 1 шт",
+        "Станок для Вытяжки проволоки СМЖ-357 – 1 шт."
+      ],
+      "email": "ozyolkoprik@gmail.com"
+    },
+    {"slug": "qayta-aloqa", "title": "Qayta aloqa", "type": "contact"}
+  ]
+}
