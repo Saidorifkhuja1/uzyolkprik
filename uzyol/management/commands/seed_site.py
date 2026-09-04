@@ -14,6 +14,7 @@ from uzyol.models import (
     NavigationItem,
     Page,
     SiteSettings,
+    FilialItem,
 )
 
 
@@ -171,6 +172,66 @@ class Command(BaseCommand):
                     order=0,
                     is_active=True,
                 )
+
+        if not FilialItem.objects.exists():
+            default_branches = [
+                {
+                    "name": "Toshkent Bosh Filiali va Temir-Beton Klasteri",
+                    "region": "Toshkent shahri va viloyati",
+                    "address": "Toshkent shahri, Yashnobod tumani, Ohangrabo koʻchasi 12-uy",
+                    "phone": "+998 55 515 16 16",
+                    "tasks": "Bosh boshqaruv, Temir-beton konstruksiyalar ishlab chiqarish, Diagnostika markazi",
+                    "status": "Asosiy bazasi",
+                    "order": 0,
+                },
+                {
+                    "name": "Vodiy Hududiy Filiali (Fargʻona, Andijon, Namangan)",
+                    "region": "Fargʻona vodiysi",
+                    "address": "Fargʻona shahri, Sanoat zonasi 4-daha",
+                    "phone": "+998 73 244 12 34",
+                    "tasks": "Koʻprik inshootlarini taʼmirlash, tovar-beton va konstruksiya taʼminoti",
+                    "status": "Faol",
+                    "order": 1,
+                },
+                {
+                    "name": "Samarqand va Zarafshon Hududiy Filiali",
+                    "region": "Samarqand va Jizzax viloyatlari",
+                    "address": "Samarqand shahri, Dagbit koʻchasi 88-uy",
+                    "phone": "+998 66 233 45 67",
+                    "tasks": "Avtomobil yoʻllaridagi koʻpriklarni diagnostika va rekonstruksiya qilish",
+                    "status": "Faol",
+                    "order": 2,
+                },
+                {
+                    "name": "Buxoro va Navoiy Hududiy Filiali",
+                    "region": "Buxoro va Navoiy viloyatlari",
+                    "address": "Buxoro shahri, Sanoatchilar koʻchasi 15-uy",
+                    "phone": "+998 65 221 78 90",
+                    "tasks": "Choʻl va magistral hududlardagi sunʼiy inshootlarni saqlash va taʼmirlash",
+                    "status": "Faol",
+                    "order": 3,
+                },
+                {
+                    "name": "Janubiy Hududiy Filiali (Qashqadaryo va Surxondaryo)",
+                    "region": "Qashqadaryo va Surxondaryo viloyatlari",
+                    "address": "Qarshi shahri, Kasan yoʻli 42-uy",
+                    "phone": "+998 75 225 33 11",
+                    "tasks": "Togʻ va murakkab relyefli koʻpriklarni tiklash va qurilish ishlari",
+                    "status": "Faol",
+                    "order": 4,
+                },
+                {
+                    "name": "Shimoliy-Gʻarbiy Filial (Xorazm va Qoraqalpogʻiston)",
+                    "region": "Xorazm viloyati va Qoraqalpogʻiston Resp.",
+                    "address": "Urganch shahri, Al-Xorazmiy koʻchasi 102-uy",
+                    "phone": "+998 62 228 99 00",
+                    "tasks": "Daryo koʻpriklari va suv inshootlari texnik diagnostikasi hamda taʼmiri",
+                    "status": "Faol",
+                    "order": 5,
+                },
+            ]
+            for branch in default_branches:
+                FilialItem.objects.create(**branch, is_active=True)
 
         self.stdout.write(self.style.SUCCESS("Seeded editable site data into database."))
 

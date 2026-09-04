@@ -15,6 +15,7 @@ import {
   MapPin,
   Menu,
   MoveRight,
+  Package,
   Phone,
   Search,
   ShieldCheck,
@@ -321,6 +322,8 @@ function PageRenderer({ page, site, onNavigate }) {
   if (page.type === "document") return <DocumentPage page={page} site={site} />;
   if (page.type === "announcement") return <Announcement page={page} />;
   if (page.type === "contact") return <Contact site={site} />;
+  if (page.slug === "narx-navo") return <PriceGridPage page={page} site={site} />;
+  if (page.type === "filiallar" || page.slug === "filiallar") return <FiliallarPage page={page} site={site} />;
   return <StatusPage page={page} site={site} />;
 }
 
@@ -526,22 +529,45 @@ function IconForIndex({ index }) {
 }
 
 function StatusPage({ page, site }) {
-  const heroSrc = site?.assets?.hero || DEFAULT_ASSETS.hero;
+  const pageImgSrc = page.imageUrl || site?.assets?.hero || DEFAULT_ASSETS.hero;
 
   return (
     <section className="page-shell">
       <PageHero title={page.title} label="Sahifa" />
-      <div className="glass-panel" style={{ padding: 48, textAlign: "center" }}>
-        <Sparkles size={40} style={{ color: "#06b6d4", marginBottom: 20 }} />
-        <h2 style={{ fontSize: 24, marginBottom: 32 }}>{page.status}</h2>
+      <div className="glass-panel" style={{ padding: 48, display: "grid", gap: 24 }}>
+        
+        {page.content ? (
+          <p style={{ fontSize: 18, lineHeight: 1.8, color: "#e2e8f0", textAlign: "left", whiteSpace: "pre-line" }}>
+            {page.content}
+          </p>
+        ) : (
+          <h2 style={{ fontSize: 24, color: "#e2e8f0", textAlign: "center" }}>{page.status || "Maʼlumot mavjud emas."}</h2>
+        )}
+
+        {page.fileUrl && (
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
+            <a
+              href={page.fileUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-primary"
+              style={{ padding: "12px 24px", fontSize: 15 }}
+              download
+            >
+              <span>Hujjatni yuklab olish</span>
+              <ExternalLink size={16} />
+            </a>
+          </div>
+        )}
+
         <img
-          src={heroSrc}
+          src={pageImgSrc}
           onError={(e) => {
             e.currentTarget.onerror = null;
             e.currentTarget.src = DEFAULT_ASSETS.hero;
           }}
           alt=""
-          style={{ width: "100%", maxHeight: 420, objectFit: "cover", borderRadius: 16 }}
+          style={{ width: "100%", maxHeight: 420, objectFit: "cover", borderRadius: 16, marginTop: 16 }}
         />
       </div>
     </section>
@@ -593,36 +619,66 @@ function Leaders({ page, site }) {
 }
 
 function DocumentPage({ page, site }) {
-  const items =
-    page.catalogItems && page.catalogItems.length > 0
-      ? page.catalogItems
-      : [
-          {
-            title: page.document || "Каталог ver. 2.pdf",
-            fileUrl:
-              "https://drive.google.com/uc?id=1m2fTdEmw9IXzEmaeZWfr-nScjt5DWw2n&export=download",
-            embedUrl:
-              "https://drive.google.com/file/d/1m2fTdEmw9IXzEmaeZWfr-nScjt5DWw2n/preview",
-            description:
-              "Oʻzyoʻlkoʻprik klasteri rasmiy zavod mahsulotlari va temir-beton konstruksiyalar katalogi (Каталог ver. 2.pdf)",
-            fileSize: "14.8 MB",
-          },
-        ];
+  const defaultDesc = page.slug === "katalog"
+    ? "Oʻzyoʻlkoʻprik klasteri rasmiy zavod mahsulotlari, koʻprik va temir-beton konstruksiyalari katalogi."
+    : page.slug === "nomenklatura"
+      ? "Oʻzyoʻlkoʻprik klasteri rasmiy zavod mahsulotlari va buyumlari nomenklaturasi."
+      : "";
+
+  const pageDesc = page.content || defaultDesc;
+
+  let items = [];
+  if (page.fileUrl) {
+    items = [
+      {
+        id: "page-file",
+        title: page.title,
+        fileUrl: page.fileUrl,
+        embedUrl: page.fileUrl,
+      }
+    ];
+  }
 
   return (
     <section className="page-shell">
       <PageHero title={page.title} label="Zavod va Texnologiyalar" />
       <div style={{ display: "grid", gap: 32 }}>
+        
+        {pageDesc && (
+          <div style={{ textAlign: "center", maxWidth: 900, margin: "0 auto 16px auto" }}>
+            <p style={{ fontSize: 18, lineHeight: 1.8, color: "#cbd5e1" }}>
+              {pageDesc}
+            </p>
+          </div>
+        )}
+
+        {page.imageUrl && (
+          <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 16 }}>
+            <img
+              src={page.imageUrl}
+              alt=""
+              style={{ width: "100%", maxHeight: 420, objectFit: "cover" }}
+            />
+          </div>
+        )}
+
         {items.map((item, index) => {
-          const embed =
-            item.embedUrl ||
-            (item.fileUrl?.includes("drive.google.com")
-              ? item.fileUrl.replace("/uc?id=", "/file/d/").replace("&export=download", "") + "/preview"
-              : null);
+          const embed = item.embedUrl;
+          const isImage = /\.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjpg|png|svg|webp)$/i.test(item.fileUrl);
 
           return (
             <div key={item.id || index} style={{ display: "grid", gap: 24 }}>
-              {embed && (
+              {embed && isImage && (
+                <div style={{ display: "flex", justifyContent: "center" }}>
+                  <img
+                    src={embed}
+                    alt={item.title}
+                    style={{ width: "100%", maxHeight: 600, objectFit: "contain", borderRadius: 8 }}
+                  />
+                </div>
+              )}
+
+              {embed && !isImage && (
                 <div className="pdf-embed-container" style={{ marginTop: 0 }}>
                   <iframe
                     src={embed}
@@ -747,6 +803,715 @@ function Footer({ site, onNavigate }) {
         <span>Aloqa sahifasi</span>
       </button>
     </footer>
+  );
+}
+
+function PriceGridPage({ page, site }) {
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCatalog, setSelectedCatalog] = useState(null);
+
+  const products = page.narxNavoProducts || [];
+  const catalogItems = page.catalogItems || [];
+
+  return (
+    <section className="page-shell">
+      <PageHero title={page.title} label="Maʼlumot" />
+
+      {page.content && (
+        <div style={{ textAlign: "center", maxWidth: 900, margin: "0 auto 32px auto" }}>
+          <p style={{ fontSize: 18, lineHeight: 1.8, color: "#cbd5e1", whiteSpace: "pre-line" }}>
+            {page.content}
+          </p>
+        </div>
+      )}
+
+      {products.length === 0 && catalogItems.length === 0 ? (
+        <div className="glass-panel" style={{ padding: 48, textAlign: "center" }}>
+          <p style={{ color: "#94a3b8", fontSize: 16 }}>Hozircha hech qanday mahsulot yoki xizmat kiritilmagan.</p>
+        </div>
+      ) : null}
+
+      {/* ── Mahsulotlar bo'limi ── */}
+      {products.length > 0 && (
+        <div style={{ marginBottom: 48 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24, marginTop: 16 }}>
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="glass-panel price-item-card"
+                onClick={() => setSelectedProduct(product)}
+                style={{
+                  padding: 0, cursor: "pointer", display: "flex", flexDirection: "column",
+                  transition: "transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+                  border: "1px solid var(--border-dim)", borderRadius: "var(--radius-md)",
+                  overflow: "hidden", height: "100%",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "var(--border-bright)"; e.currentTarget.style.boxShadow = "var(--shadow-glow)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "var(--border-dim)"; e.currentTarget.style.boxShadow = "none"; }}
+              >
+                {product.imageUrl ? (
+                  <div style={{ width: "100%", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, minHeight: 200, maxHeight: 260, overflow: "hidden" }}>
+                    <img src={product.imageUrl} alt={product.name} style={{ width: "100%", maxHeight: 260, objectFit: "contain", display: "block" }} />
+                  </div>
+                ) : (
+                  <div style={{ width: "100%", height: 120, flexShrink: 0, background: "linear-gradient(135deg, rgba(6,182,212,0.15), rgba(99,102,241,0.15))", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <Package size={40} style={{ color: "var(--accent-cyan)", opacity: 0.7 }} />
+                  </div>
+                )}
+                <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                  <h3 style={{ fontSize: 17, fontWeight: 700, color: "#ffffff", lineHeight: 1.3, margin: 0 }}>{product.name}</h3>
+                  {product.text && (
+                    <p style={{ fontSize: 14, color: "var(--text-muted)", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.6, margin: 0 }}>
+                      {product.text}
+                    </p>
+                  )}
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent-cyan)", fontSize: 13, fontWeight: 600, marginTop: "auto", paddingTop: 8 }}>
+                    {product.fileUrl && <FileText size={14} />}
+                    <span>Batafsil koʻrish</span>
+                    <ArrowRight size={14} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Katalog hujjatlari ── */}
+      {catalogItems.length > 0 && (
+        <div style={{ marginTop: products.length > 0 ? 16 : 0 }}>
+          {products.length > 0 && <h2 style={{ fontSize: 20, fontWeight: 700, color: "#ffffff", marginBottom: 20 }}>Katalog hujjatlari</h2>}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
+            {catalogItems.map((item) => (
+              <div key={item.id} className="glass-panel price-item-card" onClick={() => setSelectedCatalog(item)}
+                style={{ padding: 24, cursor: "pointer", display: "flex", flexDirection: "column", gap: 16, transition: "transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease", border: "1px solid var(--border-dim)", borderRadius: "var(--radius-md)", height: "100%" }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "var(--border-bright)"; e.currentTarget.style.boxShadow = "var(--shadow-glow)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "var(--border-dim)"; e.currentTarget.style.boxShadow = "none"; }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <FileText size={32} style={{ color: "var(--accent-cyan)" }} />
+                  {item.fileUrl && <span style={{ fontSize: 12, padding: "4px 8px", borderRadius: 12, background: "rgba(6,182,212,0.15)", color: "var(--accent-cyan)", fontWeight: 600 }}>Fayl bor</span>}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <h3 style={{ fontSize: 18, marginBottom: 8, color: "#ffffff", fontWeight: 600 }}>{item.title}</h3>
+                  {item.description && <p style={{ fontSize: 14, color: "var(--text-muted)", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.5 }}>{item.description}</p>}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent-cyan)", fontSize: 14, fontWeight: 600, marginTop: "auto" }}>
+                  <span>Batafsil koʻrish</span><ArrowRight size={16} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Mahsulot modal ── */}
+      {selectedProduct && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.85)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 24 }} onClick={() => setSelectedProduct(null)}>
+          <div className="glass-panel" style={{ maxWidth: 640, width: "100%", position: "relative", animation: "fadeIn 0.2s ease-out", overflow: "hidden", borderRadius: "var(--radius-md)", maxHeight: "90vh", display: "flex", flexDirection: "column" }} onClick={(e) => e.stopPropagation()}>
+            {/* Yopish tugmasi */}
+            <button onClick={() => setSelectedProduct(null)} style={{ position: "absolute", top: 14, right: 14, color: "var(--text-muted)", cursor: "pointer", zIndex: 10, background: "rgba(0,0,0,0.5)", borderRadius: "50%", padding: 6, display: "flex", border: "none" }}
+              onMouseEnter={(e) => e.currentTarget.style.color = "#ffffff"} onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted)"}>
+              <X size={18} />
+            </button>
+
+            {/* Scroll area */}
+            <div style={{ overflowY: "auto", flex: 1 }}>
+              {/* Rasm — to'liq ko'rinadi */}
+              {selectedProduct.imageUrl && (
+                <div style={{ width: "100%", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <img
+                    src={selectedProduct.imageUrl}
+                    alt={selectedProduct.name}
+                    style={{ width: "100%", maxHeight: 380, objectFit: "contain", display: "block" }}
+                  />
+                </div>
+              )}
+
+              <div style={{ padding: 28, display: "flex", flexDirection: "column", gap: 18 }}>
+                {/* Nom */}
+                <h2 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: 0, paddingRight: 32 }}>
+                  {selectedProduct.name}
+                </h2>
+
+                {/* Matn */}
+                {selectedProduct.text && (
+                  <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 16 }}>
+                    <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>
+                      {selectedProduct.text}
+                    </p>
+                  </div>
+                )}
+
+                {/* Fayl yuklab olish */}
+                {selectedProduct.fileUrl && (
+                  <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 16, display: "flex", justifyContent: "center" }}>
+                    <a
+                      href={selectedProduct.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-primary"
+                      style={{ padding: "12px 32px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }}
+                      download
+                    >
+                      <span>Faylni yuklab olish</span>
+                      <ExternalLink size={16} />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Katalog modal ── */}
+      {selectedCatalog && (
+        <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 24 }} onClick={() => setSelectedCatalog(null)}>
+          <div className="glass-panel" style={{ maxWidth: 600, width: "100%", padding: 32, position: "relative", display: "grid", gap: 24, animation: "fadeIn 0.2s ease-out" }} onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setSelectedCatalog(null)} style={{ position: "absolute", top: 20, right: 20, color: "var(--text-muted)", cursor: "pointer" }} onMouseEnter={(e) => e.currentTarget.style.color = "#ffffff"} onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted)"}><X size={24} /></button>
+            <div>
+              <span style={{ fontSize: 13, textTransform: "uppercase", color: "var(--accent-cyan)", fontWeight: 700, display: "block", marginBottom: 8 }}>Batafsil maʼlumot</span>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: "#ffffff", lineHeight: 1.3 }}>{selectedCatalog.title}</h2>
+            </div>
+            {selectedCatalog.description && (
+              <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 16 }}>
+                <p style={{ fontSize: 16, lineHeight: 1.6, color: "var(--text-main)", whiteSpace: "pre-line" }}>{selectedCatalog.description}</p>
+              </div>
+            )}
+            {selectedCatalog.fileUrl && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 16, borderTop: "1px solid var(--border-dim)", paddingTop: 20 }}>
+                {selectedCatalog.fileUrl.toLowerCase().endsWith(".pdf") ? (
+                  <div style={{ width: "100%", height: 350, borderRadius: 8, overflow: "hidden", border: "1px solid var(--border-dim)", marginBottom: 12 }}>
+                    <iframe src={selectedCatalog.fileUrl} title={selectedCatalog.title} style={{ width: "100%", height: "100%", border: "none" }} />
+                  </div>
+                ) : /\.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjpg|png|svg|webp)$/i.test(selectedCatalog.fileUrl) ? (
+                  <div style={{ width: "100%", display: "flex", justifyContent: "center", borderRadius: 8, overflow: "hidden", marginBottom: 12 }}>
+                    <img src={selectedCatalog.fileUrl} alt={selectedCatalog.title} style={{ maxWidth: "100%", maxHeight: 300, objectFit: "contain" }} />
+                  </div>
+                ) : null}
+                <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: 8 }}>
+                  <a href={selectedCatalog.fileUrl} target="_blank" rel="noreferrer" className="btn-primary" style={{ padding: "12px 28px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }} download>
+                    <span>Faylni yuklab olish</span><ExternalLink size={16} />
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+
+
+function FiliallarPage({ page, site }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedBranch, setSelectedBranch] = useState(null);
+
+  const defaultBranches = [
+    {
+      id: 1,
+      name: "Toshkent Bosh Filiali va Temir-Beton Klasteri",
+      region: "Toshkent shahri va viloyati",
+      director: "Raximov Anvar Olimovich",
+      address: "Toshkent shahri, Yashnobod tumani, Ohangrabo koʻchasi 12-uy",
+      phone: "+998 55 515 16 16",
+      tasks: "Bosh boshqaruv, Temir-beton konstruksiyalar ishlab chiqarish, Diagnostika markazi",
+      status: "Asosiy bazasi",
+      description: "Klaster bosh boshqarmasi va temir-beton buyumlari ishlab chiqaruvchi eng yirik majmua.",
+    },
+    {
+      id: 2,
+      name: "Vodiy Hududiy Filiali (Fargʻona, Andijon, Namangan)",
+      region: "Fargʻona vodiysi",
+      director: "Qodirov Sardor Bahromovich",
+      address: "Fargʻona shahri, Sanoat zonasi 4-daha",
+      phone: "+998 73 244 12 34",
+      tasks: "Koʻprik inshootlarini taʼmirlash, tovar-beton va konstruksiya taʼminoti",
+      status: "Faol",
+      description: "Fargʻona vodiysidagi avtomobil yoʻllari hamda koʻprik qurilishi boʻyicha masʼul hududiy filial.",
+    },
+    {
+      id: 3,
+      name: "Samarqand va Zarafshon Hududiy Filiali",
+      region: "Samarqand va Jizzax viloyatlari",
+      director: "Yoqubov Jasur Alisherovich",
+      address: "Samarqand shahri, Dagbit koʻchasi 88-uy",
+      phone: "+998 66 233 45 67",
+      tasks: "Avtomobil yoʻllaridagi koʻpriklarni diagnostika va rekonstruksiya qilish",
+      status: "Faol",
+      description: "Samarqand va Jizzax hududidagi koʻprik va sunʼiy inshootlarni texnik soz holatda saqlash.",
+    },
+    {
+      id: 4,
+      name: "Buxoro va Navoiy Hududiy Filiali",
+      region: "Buxoro va Navoiy viloyatlari",
+      director: "Nazarov Bobur Shavkatovich",
+      address: "Buxoro shahri, Sanoatchilar koʻchasi 15-uy",
+      phone: "+998 65 221 78 90",
+      tasks: "Choʻl va magistral hududlardagi sunʼiy inshootlarni saqlash va taʼmirlash",
+      status: "Faol",
+      description: "Choʻl hududlari hamda magistral yoʻllardagi koʻpriklar ekspluatatsiyasi.",
+    },
+    {
+      id: 5,
+      name: "Janubiy Hududiy Filiali (Qashqadaryo va Surxondaryo)",
+      region: "Qashqadaryo va Surxondaryo viloyatlari",
+      director: "Xoliqov Temur Rustamovich",
+      address: "Qarshi shahri, Kasan yoʻli 42-uy",
+      phone: "+998 75 225 33 11",
+      tasks: "Togʻ va murakkab relyefli koʻpriklarni tiklash va qurilish ishlari",
+      status: "Faol",
+      description: "Qashqadaryo va Surxondaryo viloyatlaridagi togʻli va murakkab koʻprik obyektlari.",
+    },
+    {
+      id: 6,
+      name: "Shimoliy-Gʻarbiy Filial (Xorazm va Qoraqalpogʻiston)",
+      region: "Xorazm viloyati va Qoraqalpogʻiston Resp.",
+      director: "Muradov Sherzod Ilhomovich",
+      address: "Urganch shahri, Al-Xorazmiy koʻchasi 102-uy",
+      phone: "+998 62 228 99 00",
+      tasks: "Daryo koʻpriklari va suv inshootlari texnik diagnostikasi hamda taʼmiri",
+      status: "Faol",
+      description: "Amudaryo va kanal koʻpriklari hamda hududiy temir-beton inshootlari taʼminoti.",
+    },
+  ];
+
+  const branches = page?.branches && page.branches.length > 0 ? page.branches : defaultBranches;
+
+  const filteredBranches = branches.filter(
+    (b) =>
+      (b.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (b.region || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (b.address || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (b.director || "").toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const pageDesc =
+    page?.content ||
+    page?.status ||
+    "Respublika boʻyicha “Oʻzyoʻlkoʻprik” klasteri hududiy filiallari va ishlab chiqarish bazalari.";
+
+  return (
+    <section className="page-shell">
+      <PageHero title={page?.title || "Filiallar"} label="Hududiy Tarmoq" />
+
+      <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gap: 32 }}>
+        {/* Banner va Tavsif */}
+        <div className="glass-panel" style={{ padding: 32, borderRadius: "var(--radius-md)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
+            <Building2 size={32} style={{ color: "var(--accent-cyan)" }} />
+            <div>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: "#ffffff", margin: 0 }}>
+                Hududiy Filiallar va Bazalar
+              </h2>
+              <p style={{ fontSize: 15, color: "var(--text-muted)", margin: "4px 0 0 0" }}>
+                {pageDesc}
+              </p>
+            </div>
+          </div>
+
+          {/* Qidiruv input */}
+          <div style={{ marginTop: 24, position: "relative", maxWidth: 500 }}>
+            <Search
+              size={18}
+              style={{
+                position: "absolute",
+                left: 16,
+                top: "50%",
+                transform: "translateY(-50%)",
+                color: "var(--text-muted)",
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Filial, rahbariyat yoki hudud boʻyicha qidiruv..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px 16px 12px 44px",
+                borderRadius: 24,
+                border: "1px solid var(--border-bright)",
+                background: "rgba(15, 23, 42, 0.6)",
+                color: "#ffffff",
+                fontSize: 15,
+                outline: "none",
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Filiallar kartalari Grid */}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+            gap: 24,
+          }}
+        >
+          {filteredBranches.map((branch) => (
+            <div
+              key={branch.id}
+              className="glass-panel price-item-card"
+              onClick={() => setSelectedBranch(branch)}
+              style={{
+                padding: 24,
+                borderRadius: "var(--radius-md)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 16,
+                border: "1px solid var(--border-dim)",
+                cursor: "pointer",
+                transition: "transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.borderColor = "var(--border-bright)";
+                e.currentTarget.style.boxShadow = "var(--shadow-glow)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.borderColor = "var(--border-dim)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              {/* Filial rasmi (agar bo'lsa) */}
+              {branch.imageUrl && (
+                <div style={{ width: "100%", borderRadius: 8, overflow: "hidden", maxHeight: 180 }}>
+                  <img
+                    src={branch.imageUrl}
+                    alt={branch.name}
+                    style={{ width: "100%", height: 180, objectFit: "cover", display: "block" }}
+                  />
+                </div>
+              )}
+
+              {/* Sarlavha & Holat */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: "#ffffff", margin: 0, lineHeight: 1.4 }}>
+                  {branch.name}
+                </h3>
+                {branch.status && (
+                  <span
+                    style={{
+                      fontSize: 12,
+                      padding: "4px 10px",
+                      borderRadius: 12,
+                      background: branch.status === "Asosiy bazasi" ? "rgba(6, 182, 212, 0.2)" : "rgba(16, 185, 129, 0.15)",
+                      color: branch.status === "Asosiy bazasi" ? "var(--accent-cyan)" : "#10b981",
+                      fontWeight: 600,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {branch.status}
+                  </span>
+                )}
+              </div>
+
+              {/* Direktor ma'lumoti hamda rasmi */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  padding: "12px 16px",
+                  borderRadius: 12,
+                  background: "rgba(6, 182, 212, 0.08)",
+                  border: "1px solid rgba(6, 182, 212, 0.2)",
+                }}
+              >
+                {branch.directorImageUrl ? (
+                  <img
+                    src={branch.directorImageUrl}
+                    alt={branch.director || "Direktor"}
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "2px solid var(--accent-cyan)",
+                      flexShrink: 0,
+                      boxShadow: "0 0 10px rgba(6, 182, 212, 0.25)",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: 52,
+                      height: 52,
+                      borderRadius: "50%",
+                      background: "rgba(6, 182, 212, 0.2)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                      border: "2px solid var(--accent-cyan)",
+                    }}
+                  >
+                    <UserRound size={26} style={{ color: "var(--accent-cyan)" }} />
+                  </div>
+                )}
+                <div>
+                  <span style={{ fontSize: 11, color: "var(--accent-cyan)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 2 }}>
+                    Filial Rahbari (Direktor)
+                  </span>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: "#ffffff" }}>
+                    {branch.director || "Maʼlumot kiritilmagan"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Rekvizitlar */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, fontSize: 14, color: "var(--text-main)" }}>
+                {branch.region && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, color: "var(--accent-cyan)" }}>
+                    <MapPin size={16} />
+                    <span style={{ fontWeight: 600, color: "#e2e8f0" }}>{branch.region}</span>
+                  </div>
+                )}
+
+                {branch.address && (
+                  <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                    <Building2 size={16} style={{ color: "var(--text-muted)", marginTop: 2, flexShrink: 0 }} />
+                    <span style={{ color: "var(--text-muted)" }}>{branch.address}</span>
+                  </div>
+                )}
+
+                {branch.phone && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <Phone size={16} style={{ color: "var(--text-muted)", flexShrink: 0 }} />
+                    <a href={`tel:${branch.phone.replace(/\s+/g, '')}`} style={{ color: "var(--accent-cyan)", textDecoration: "none" }} onClick={(e) => e.stopPropagation()}>
+                      {branch.phone}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Card pastidagi tugma */}
+              <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent-cyan)", fontSize: 14, fontWeight: 600, marginTop: "auto", paddingTop: 8 }}>
+                <span>Batafsil maʼlumotlarni koʻrish</span>
+                <ArrowRight size={16} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Filial to'liq ma'lumotlari Modali ── */}
+      {selectedBranch && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.85)",
+            backdropFilter: "blur(10px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            padding: 24,
+          }}
+          onClick={() => setSelectedBranch(null)}
+        >
+          <div
+            className="glass-panel"
+            style={{
+              maxWidth: 720,
+              width: "100%",
+              position: "relative",
+              animation: "fadeIn 0.2s ease-out",
+              overflow: "hidden",
+              borderRadius: "var(--radius-md)",
+              maxHeight: "90vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Yopish tugmasi */}
+            <button
+              onClick={() => setSelectedBranch(null)}
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                color: "#ffffff",
+                cursor: "pointer",
+                zIndex: 10,
+                background: "rgba(0,0,0,0.6)",
+                borderRadius: "50%",
+                padding: 10,
+                display: "flex",
+                border: "1px solid rgba(255,255,255,0.2)",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(6,182,212,0.8)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0.6)")}
+            >
+              <X size={22} />
+            </button>
+
+            <div style={{ overflowY: "auto", flex: 1 }}>
+              {/* Filial Rasmi */}
+              {selectedBranch.imageUrl && (
+                <div style={{ width: "100%", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <img
+                    src={selectedBranch.imageUrl}
+                    alt={selectedBranch.name}
+                    style={{ width: "100%", maxHeight: 350, objectFit: "cover", display: "block" }}
+                  />
+                </div>
+              )}
+
+              <div style={{ padding: 32, display: "flex", flexDirection: "column", gap: 24 }}>
+                {/* Sarlavha hamda status */}
+                <div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 13, padding: "4px 14px", borderRadius: 14, background: "rgba(6,182,212,0.15)", color: "var(--accent-cyan)", fontWeight: 700 }}>
+                      {selectedBranch.region || "Hududiy Filial"}
+                    </span>
+                    {selectedBranch.status && (
+                      <span style={{ fontSize: 13, padding: "4px 14px", borderRadius: 14, background: "rgba(16,185,129,0.15)", color: "#10b981", fontWeight: 700 }}>
+                        {selectedBranch.status}
+                      </span>
+                    )}
+                  </div>
+                  <h2 style={{ fontSize: 26, fontWeight: 700, color: "#ffffff", margin: 0, lineHeight: 1.3 }}>
+                    {selectedBranch.name}
+                  </h2>
+                </div>
+
+                {/* Rahbariyat / Direktor katta rasmli bloki */}
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 20,
+                    padding: 24,
+                    borderRadius: 16,
+                    background: "linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(15, 23, 42, 0.8))",
+                    border: "1px solid rgba(6, 182, 212, 0.3)",
+                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  {selectedBranch.directorImageUrl ? (
+                    <img
+                      src={selectedBranch.directorImageUrl}
+                      alt={selectedBranch.director || "Direktor"}
+                      style={{
+                        width: 110,
+                        height: 110,
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        border: "3px solid var(--accent-cyan)",
+                        boxShadow: "0 0 20px rgba(6, 182, 212, 0.35)",
+                        flexShrink: 0,
+                      }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: 110,
+                        height: 110,
+                        borderRadius: "50%",
+                        background: "rgba(6, 182, 212, 0.2)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        border: "3px solid var(--accent-cyan)",
+                        boxShadow: "0 0 20px rgba(6, 182, 212, 0.35)",
+                      }}
+                    >
+                      <UserRound size={56} style={{ color: "var(--accent-cyan)" }} />
+                    </div>
+                  )}
+                  <div>
+                    <span style={{ fontSize: 12, color: "var(--accent-cyan)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 4, letterSpacing: 0.5 }}>
+                      Filial Rahbari (Direktor)
+                    </span>
+                    <h3 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: 0, lineHeight: 1.3 }}>
+                      {selectedBranch.director || "Maʼlumot kiritilmagan"}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Aloqa va Manzil */}
+                <div style={{ display: "grid", gap: 16, fontSize: 15, borderTop: "1px solid var(--border-dim)", paddingTop: 20 }}>
+                  {selectedBranch.address && (
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+                      <Building2 size={22} style={{ color: "var(--accent-cyan)", marginTop: 2, flexShrink: 0 }} />
+                      <div>
+                        <strong style={{ color: "#ffffff", display: "block", fontSize: 14, marginBottom: 2 }}>Manzil:</strong>
+                        <span style={{ color: "var(--text-muted)", fontSize: 15 }}>{selectedBranch.address}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedBranch.phone && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                      <Phone size={22} style={{ color: "var(--accent-cyan)", flexShrink: 0 }} />
+                      <div>
+                        <strong style={{ color: "#ffffff", display: "block", fontSize: 14, marginBottom: 2 }}>Telefon raqami:</strong>
+                        <a href={`tel:${selectedBranch.phone.replace(/\s+/g, '')}`} style={{ color: "var(--accent-cyan)", textDecoration: "none", fontWeight: 700, fontSize: 16 }}>
+                          {selectedBranch.phone}
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Filial haqida ma'lumot (Tavsif) */}
+                {selectedBranch.description && (
+                  <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 20 }}>
+                    <h4 style={{ fontSize: 17, fontWeight: 700, color: "#ffffff", marginBottom: 10 }}>
+                      Filial Haqida Maʼlumot
+                    </h4>
+                    <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>
+                      {selectedBranch.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Asosiy faoliyati (Vazifalar) */}
+                {selectedBranch.tasks && (
+                  <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 20 }}>
+                    <h4 style={{ fontSize: 17, fontWeight: 700, color: "#ffffff", marginBottom: 10 }}>
+                      Asosiy Faoliyati va Vazifalari
+                    </h4>
+                    <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>
+                      {selectedBranch.tasks}
+                    </p>
+                  </div>
+                )}
+
+                {/* Fayl yuklab olish (agar bor bo'lsa) */}
+                {selectedBranch.fileUrl && (
+                  <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 20, display: "flex", justifyContent: "center" }}>
+                    <a
+                      href={selectedBranch.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-primary"
+                      style={{ padding: "12px 32px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }}
+                      download
+                    >
+                      <span>Hujjatni yuklab olish</span>
+                      <ExternalLink size={16} />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 

@@ -143,6 +143,8 @@ class Page(models.Model):
     ANNOUNCEMENT = "announcement"
     CONTACT = "contact"
 
+    FILIALLAR = "filiallar"
+
     PAGE_TYPES = (
         (HOME, "Bosh sahifa"),
         (EMPTY, "Boʻsh sahifa"),
@@ -151,15 +153,21 @@ class Page(models.Model):
         (DOCUMENT, "Hujjat"),
         (ANNOUNCEMENT, "Eʼlon"),
         (CONTACT, "Qayta aloqa"),
+        (FILIALLAR, "Filiallar"),
     )
 
-    slug = models.SlugField(max_length=128, unique=True, verbose_name="Slug (URL manzili)")
+    slug = models.SlugField(max_length=128, blank=True, unique=True, verbose_name="Slug (URL manzili)")
     title = models.CharField(max_length=255, verbose_name="Sahifa sarlavhasi")
-    type = models.CharField(max_length=32, choices=PAGE_TYPES, verbose_name="Sahifa turi")
+    type = models.CharField(max_length=32, choices=PAGE_TYPES, default="status", verbose_name="Sahifa turi")
     status = models.TextField(blank=True, verbose_name="Holat (Status)")
     document = models.CharField(max_length=255, blank=True, verbose_name="Hujjat nomi")
     order = models.PositiveIntegerField(default=0, verbose_name="Tartib raqami")
     is_active = models.BooleanField(default=True, verbose_name="Faol")
+
+    # New fields:
+    content = models.TextField(blank=True, verbose_name="Matn (Content)")
+    file = models.FileField(upload_to="pages/", blank=True, null=True, verbose_name="Fayl yuklash (File)")
+    image = models.ImageField(upload_to="pages/", blank=True, null=True, verbose_name="Rasm yuklash (Image)")
 
     class Meta:
         ordering = ("order", "id")
@@ -169,12 +177,21 @@ class Page(models.Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.title)
+            if not self.slug:
+                self.slug = self.title.lower().replace(" ", "-").replace("ʻ", "").replace("'", "")
+        super().save(*args, **kwargs)
+
 
 class Leader(models.Model):
     name = models.CharField(max_length=255, verbose_name="F.I.SH.")
     position = models.CharField(max_length=255, verbose_name="Lavozimi")
     born = models.CharField(max_length=255, blank=True, verbose_name="Tugʻilgan yili va joyi")
     education = models.TextField(blank=True, verbose_name="Maʼlumoti")
+    image = models.ImageField(upload_to="leaders/", blank=True, null=True, verbose_name="Rasm yuklash (Image)")
     image_url = models.URLField(max_length=2000, blank=True, verbose_name="Rasm havolasi")
     order = models.PositiveIntegerField(default=0, verbose_name="Tartib raqami")
     is_active = models.BooleanField(default=True, verbose_name="Faol")
@@ -186,6 +203,11 @@ class Leader(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_image_url(self):
+        if self.image:
+            return self.image.url
+        return self.image_url
 
 
 class Announcement(models.Model):
@@ -276,3 +298,141 @@ class CatalogItem(models.Model):
                 file_id = url.split("id=")[1].split("&")[0]
                 return f"https://drive.google.com/file/d/{file_id}/preview"
         return url
+
+
+class NarxNavoProduct(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Mahsulot nomi")
+    text = models.TextField(blank=True, verbose_name="Matn (tavsif)")
+    file = models.FileField(upload_to="narx_navo/files/", blank=True, null=True, verbose_name="Fayl")
+    image = models.ImageField(upload_to="narx_navo/images/", blank=True, null=True, verbose_name="Rasm")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib raqami")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqti")
+
+    class Meta:
+        ordering = ("order", "id")
+        verbose_name = "narx-navo mahsuloti"
+        verbose_name_plural = "narx-navo mahsulotlari"
+
+    def __str__(self):
+        return self.name
+
+
+class ElonlarProduct(models.Model):
+    name = models.CharField(max_length=255, verbose_name="E'lon nomi")
+    text = models.TextField(blank=True, verbose_name="Matn (tavsif)")
+    file = models.FileField(upload_to="elonlar/files/", blank=True, null=True, verbose_name="Fayl")
+    image = models.ImageField(upload_to="elonlar/images/", blank=True, null=True, verbose_name="Rasm")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib raqami")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqti")
+
+    class Meta:
+        ordering = ("order", "id")
+        verbose_name = "e'lon"
+        verbose_name_plural = "e'lonlar"
+
+    def __str__(self):
+        return self.name
+
+
+class BoshIshOrinlariProduct(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Ish o'rni nomi")
+    text = models.TextField(blank=True, verbose_name="Matn (tavsif)")
+    file = models.FileField(upload_to="bosh_ish_orinlari/files/", blank=True, null=True, verbose_name="Fayl")
+    image = models.ImageField(upload_to="bosh_ish_orinlari/images/", blank=True, null=True, verbose_name="Rasm")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib raqami")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqti")
+
+    class Meta:
+        ordering = ("order", "id")
+        verbose_name = "bo'sh ish o'rni"
+        verbose_name_plural = "bo'sh ish o'rinlari"
+
+    def __str__(self):
+        return self.name
+
+
+class FilialItem(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Filial nomi")
+    region = models.CharField(max_length=255, blank=True, verbose_name="Hudud (Viloyat)")
+    director = models.CharField(max_length=255, blank=True, verbose_name="Filial rahbari (Direktor)")
+    director_image = models.ImageField(upload_to="filiallar/directors/", blank=True, null=True, verbose_name="Direktor rasmi")
+    description = models.TextField(blank=True, verbose_name="Filial haqida ma'lumot")
+    address = models.TextField(blank=True, verbose_name="Manzil")
+    image = models.ImageField(upload_to="filiallar/images/", blank=True, null=True, verbose_name="Filial rasmi")
+    phone = models.CharField(max_length=128, blank=True, verbose_name="Telefon raqami")
+    tasks = models.TextField(blank=True, verbose_name="Asosiy faoliyati (Vazifalari)")
+    status = models.CharField(max_length=64, default="Faol", verbose_name="Holati (Masalan: Faol, Asosiy bazasi)")
+    file = models.FileField(upload_to="filiallar/files/", blank=True, null=True, verbose_name="Fayl / Hujjat")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib raqami")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqti")
+
+    class Meta:
+        ordering = ("order", "id")
+        verbose_name = "Filial"
+        verbose_name_plural = "Filiallar"
+
+    def __str__(self):
+        return self.name
+
+
+
+
+class KorxonaUstavi(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Korxona ustavi"
+        verbose_name_plural = "Korxona ustavi"
+
+
+class TashkiliyTuzilma(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Tashkiliy tuzilma"
+        verbose_name_plural = "Tashkiliy tuzilma"
+
+
+class NarxNavo(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Narx-navo"
+        verbose_name_plural = "Narx-navo"
+
+
+class BoshIshOrinlari(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Boʻsh ish oʻrinlari"
+        verbose_name_plural = "Boʻsh ish oʻrinlari"
+
+
+class QaytaAloqa(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Qayta aloqa"
+        verbose_name_plural = "Qayta aloqa"
+
+
+class KatalogPage(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Katalog"
+        verbose_name_plural = "Katalog"
+
+
+class NomenklaturaPage(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Nomenklatura"
+        verbose_name_plural = "Nomenklatura"
+
+
+class FiliallarPage(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Filiallar"
+        verbose_name_plural = "Filiallar"
+

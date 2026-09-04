@@ -67,6 +67,20 @@ class CatalogItemSerializer(serializers.Serializer):
     fileSize = serializers.CharField(source="file_size", allow_blank=True, required=False)
 
 
+class NarxNavoProductSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    text = serializers.CharField(allow_blank=True, required=False)
+    fileUrl = serializers.SerializerMethodField()
+    imageUrl = serializers.SerializerMethodField()
+
+    def get_fileUrl(self, obj):
+        return obj.file.url if obj.file else None
+
+    def get_imageUrl(self, obj):
+        return obj.image.url if obj.image else None
+
+
 
 class PageSerializer(serializers.Serializer):
     slug = serializers.CharField()
@@ -79,6 +93,9 @@ class PageSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     leaders = LeaderSerializer(many=True, required=False)
     catalogItems = CatalogItemSerializer(many=True, required=False, source="catalog_items")
+    content = serializers.CharField(required=False, allow_blank=True)
+    fileUrl = serializers.CharField(required=False, allow_null=True)
+    imageUrl = serializers.CharField(required=False, allow_null=True)
 
 
 

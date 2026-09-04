@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Announcement, HomeContent, Leader, NavigationItem, Page, SiteSettings
+from .models import Announcement, HomeContent, Leader, NavigationItem, NarxNavoProduct, FilialItem, Page, SiteSettings
 from .serializers import ErrorSerializer, PageSerializer, PagesResponseSerializer, SitePayloadSerializer
 
 
@@ -34,12 +34,11 @@ def _settings_payload(settings):
             "hero": hero_url,
             "plant": plant_url,
             "contact": settings.contact_image_url,
-            "leaders": list(
-                Leader.objects.filter(is_active=True)
-                .exclude(image_url="")
-                .order_by("order", "id")
-                .values_list("image_url", flat=True)
-            ),
+            "leaders": [
+                leader.get_image_url()
+                for leader in Leader.objects.filter(is_active=True).order_by("order", "id")
+                if leader.get_image_url()
+            ],
         },
         "contact": {
             "phones": phones,
@@ -98,15 +97,15 @@ def _home_payload():
 
 
 def _leader_payload(page):
-    image_urls = list(
-        Leader.objects.filter(is_active=True)
-        .exclude(image_url="")
-        .order_by("order", "id")
-        .values_list("image_url", flat=True)
-    )
+    image_urls = [
+        leader.get_image_url()
+        for leader in Leader.objects.filter(is_active=True).order_by("order", "id")
+        if leader.get_image_url()
+    ]
     leaders = []
     for leader in Leader.objects.filter(is_active=True).order_by("order", "id"):
-        image_index = image_urls.index(leader.image_url) if leader.image_url in image_urls else None
+        img_url = leader.get_image_url()
+        image_index = image_urls.index(img_url) if img_url in image_urls else None
         leaders.append(
             {
                 "name": leader.name,
@@ -161,6 +160,9 @@ def _page_payload(page):
         "slug": page.slug,
         "title": page.title,
         "type": page.type,
+        "content": page.content,
+        "fileUrl": page.file.url if page.file else None,
+        "imageUrl": page.image.url if page.image else None,
     }
     if page.status:
         payload["status"] = page.status
@@ -170,6 +172,41 @@ def _page_payload(page):
     catalog_items = _catalog_items_payload(page)
     if catalog_items:
         payload["catalogItems"] = catalog_items
+
+    # Narx-navo mahsulotlari
+    if page.slug == "narx-navo":
+        products = NarxNavoProduct.objects.filter(is_active=True).order_by("order", "id")
+        payload["narxNavoProducts"] = [
+            {
+                "id": p.id,
+                "name": p.name,
+                "text": p.text,
+                "fileUrl": p.file.url if p.file else None,
+                "imageUrl": p.image.url if p.image else None,
+            }
+            for p in products
+        ]
+
+    # Filiallar ro'yxati
+    if page.slug == "filiallar":
+        filials = FilialItem.objects.filter(is_active=True).order_by("order", "id")
+        payload["branches"] = [
+            {
+                "id": f.id,
+                "name": f.name,
+                "region": f.region,
+                "director": f.director,
+                "directorImageUrl": f.director_image.url if f.director_image else None,
+                "description": f.description,
+                "address": f.address,
+                "imageUrl": f.image.url if f.image else None,
+                "phone": f.phone,
+                "tasks": f.tasks,
+                "status": f.status,
+                "fileUrl": f.file.url if f.file else None,
+            }
+            for f in filials
+        ]
 
     return payload
 

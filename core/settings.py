@@ -333,6 +333,8 @@ JAZZMIN_UI_TWEAKS = {
     }
 }
 
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 
 
 

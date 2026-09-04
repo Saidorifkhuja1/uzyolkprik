@@ -35,6 +35,7 @@
         {"label": "Boʻsh ish oʻrinlari", "slug": "bosh-ish-orinlari"}
       ]
     },
+    {"label": "Filiallar", "slug": "filiallar"},
     {"label": "Eʼlonlar", "slug": "elonlar"},
     {"label": "Qayta aloqa", "slug": "qayta-aloqa"}
   ],
@@ -67,7 +68,6 @@
   },
   "pages": [
     {"slug": "bosh-sahifa", "title": "Bosh sahifa", "type": "home"},
-    {"slug": "korxona-haqida", "title": "Korxona haqida", "type": "empty", "status": "Maʼlumotlar shakllantirilmoqda."},
     {"slug": "korxona-ustavi", "title": "Korxona ustavi", "type": "status", "status": "Ishlab chiqish bosqichida (На стадии разработки)."},
     {"slug": "tashkiliy-tuzilma", "title": "Tashkiliy tuzilma", "type": "status", "status": "Ishlab chiqish bosqichida (На стадии разработки)."},
     {
@@ -84,6 +84,12 @@
     {"slug": "nomenklatura", "title": "Nomenklatura", "type": "document", "document": "Номенклатура PDF.pdf"},
     {"slug": "narx-navo", "title": "Narx-navo", "type": "empty", "status": "Narx-navo maʼlumotlari shakllantirilmoqda."},
     {"slug": "bosh-ish-orinlari", "title": "Boʻsh ish oʻrinlari", "type": "status", "status": "Ishlab chiqish bosqichida (На стадии разработки)."},
+    {
+      "slug": "filiallar",
+      "title": "Filiallar",
+      "type": "filiallar",
+      "status": "Respublika boʻyicha “Oʻzyoʻlkoʻprik” klasteri hududiy filiallari va ishlab chiqarish bazalari."
+    },
     {
       "slug": "elonlar",
       "title": "Eʼlonlar",
