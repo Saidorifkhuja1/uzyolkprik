@@ -10,16 +10,19 @@ import {
   ExternalLink,
   FileText,
   HardHat,
+  Languages,
   Layers,
   Mail,
   MapPin,
   Menu,
+  Moon,
   MoveRight,
   Package,
   Phone,
   Search,
   ShieldCheck,
   Sparkles,
+  Sun,
   UserRound,
   Wrench,
   X,
@@ -27,9 +30,54 @@ import {
 import { API_DOCS, fetchSite } from "./api";
 import "./styles.css";
 
+// ============================================================
+// TRANSLATIONS — O'zbek (default), Rus, Ingliz
+// ============================================================
+const TRANSLATIONS = {
+  uz: {
+    loading: "Sayt ma\u02bclumotlari yuklanmoqda...",
+    backendCheck: "Backend ishlayotganini tekshiring: http://127.0.0.1:8000",
+    pageNotFound: "Sahifa topilmadi",
+    contact: "Aloqa",
+    searchPlaceholder: "Sahifa nomi yoki kalit s\u02bcozni kiriting...",
+    searchTitle: "Sayt b\u02bcyicha qidiruv",
+    searchPageLabel: "Sayt sahifasi",
+    legalSmall: "klasteri davlat muassasasi",
+    heroBtn1: "Katalogni k\u02bcrishch",
+    heroBtn2: "Bog\u02bclanish",
+    lang: "UZ",
+  },
+  ru: {
+    loading: "\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430 \u0434\u0430\u043d\u043d\u044b\u0445 \u0441\u0430\u0439\u0442\u0430...",
+    backendCheck: "\u041f\u0440\u043e\u0432\u0435\u0440\u044c\u0442\u0435 \u0440\u0430\u0431\u043e\u0442\u0443 \u0431\u0430\u0441\u044f: http://127.0.0.1:8000",
+    pageNotFound: "\u0421\u0442\u0440\u0430\u043d\u0438\u0446\u0430 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u0430",
+    contact: "\u0421\u0432\u044f\u0437\u044c",
+    searchPlaceholder: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u0438\u043b\u0438 \u043a\u043b\u044e\u0447\u0435\u0432\u043e\u0435 \u0441\u043b\u043e\u0432\u043e...",
+    searchTitle: "\u041f\u043e\u0438\u0441\u043a \u043f\u043e \u0441\u0430\u0439\u0442\u0443",
+    searchPageLabel: "\u0421\u0442\u0440\u0430\u043d\u0438\u0446\u0430 \u0441\u0430\u0439\u0442\u0430",
+    legalSmall: "\u0433\u043e\u0441\u0443\u0434\u0430\u0440\u0441\u0442\u0432\u0435\u043d\u043d\u043e\u0435 \u0443\u0447\u0440\u0435\u0436\u0434\u0435\u043d\u0438\u0435 \u043a\u043b\u0430\u0441\u0442\u0435\u0440\u0430",
+    heroBtn1: "\u041f\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u043a\u0430\u0442\u0430\u043b\u043e\u0433",
+    heroBtn2: "\u0421\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f",
+    lang: "RU",
+  },
+  en: {
+    loading: "Loading site data...",
+    backendCheck: "Check that backend is running: http://127.0.0.1:8000",
+    pageNotFound: "Page not found",
+    contact: "Contact",
+    searchPlaceholder: "Enter page name or keyword...",
+    searchTitle: "Search the site",
+    searchPageLabel: "Site page",
+    legalSmall: "state cluster institution",
+    heroBtn1: "View catalog",
+    heroBtn2: "Get in touch",
+    lang: "EN",
+  },
+};
+
 // Pristine Default High-Tech Bridge Plant & Concrete Cluster Asset
 const DEFAULT_ASSETS = {
-  logo: `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none"><rect width="200" height="200" rx="40" fill="%230E1726"/><path d="M40 130 C 70 60, 130 60, 160 130" stroke="%2306B6D4" stroke-width="14" stroke-linecap="round"/><path d="M55 125 C 80 80, 120 80, 145 125" stroke="%23F59E0B" stroke-width="8"/><path d="M30 145 Q 100 120 170 145" stroke="%230F766E" stroke-width="12" stroke-linecap="round"/><path d="M100 73 V 127 M75 88 V 125 M125 88 V 125" stroke="%2306B6D4" stroke-width="4" stroke-dasharray="4 4"/></svg>`,
+  logo: "/logo.png",
 
   hero: "/plant_hero.png",
   plant: "/plant_hero.png",
@@ -51,6 +99,33 @@ function App() {
   const [activeSlug, setActiveSlug] = useState(getInitialSlug);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+
+  // Theme: dark (default) | light
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("uz_theme") || "dark";
+  });
+
+  // Language: uz (default) | ru | en
+  const [lang, setLang] = useState(() => {
+    return localStorage.getItem("uz_lang") || "uz";
+  });
+
+  const t = TRANSLATIONS[lang] || TRANSLATIONS.uz;
+
+  // Apply theme to <html> element
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("uz_theme", theme);
+  }, [theme]);
+
+  // Apply lang to <html> element
+  useEffect(() => {
+    document.documentElement.setAttribute("lang", lang);
+    localStorage.setItem("uz_lang", lang);
+  }, [lang]);
+
+  const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  const changeLang = (newLang) => setLang(newLang);
 
   useEffect(() => {
     fetchSite()
@@ -83,10 +158,10 @@ function App() {
         {loadError ? (
           <div style={{ maxWidth: 480 }}>
             <p style={{ color: "#ef4444", fontWeight: 700, marginBottom: 8 }}>{loadError}</p>
-            <p style={{ fontSize: 13, color: "#94a3b8" }}>Backend ishlayotganini tekshiring: http://127.0.0.1:8000</p>
+            <p style={{ fontSize: 13, color: "#94a3b8" }}>{t.backendCheck}</p>
           </div>
         ) : (
-          <p style={{ color: "#94a3b8" }}>Sayt maʼlumotlari yuklanmoqda...</p>
+          <p style={{ color: "#94a3b8" }}>{t.loading}</p>
         )}
       </main>
     );
@@ -108,26 +183,35 @@ function App() {
         menuOpen={menuOpen}
         setMenuOpen={setMenuOpen}
         onOpenSearch={() => setSearchOpen(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        lang={lang}
+        onChangeLang={changeLang}
+        t={t}
       />
       <main>
-        <PageRenderer page={activePage} site={site} onNavigate={navigate} />
+        <PageRenderer page={activePage} site={site} onNavigate={navigate} t={t} lang={lang} />
       </main>
-      <Footer site={site} onNavigate={navigate} />
+      <Footer site={site} onNavigate={navigate} t={t} />
 
       {searchOpen && (
-        <SearchModal site={site} onClose={() => setSearchOpen(false)} onNavigate={navigate} />
+        <SearchModal site={site} onClose={() => setSearchOpen(false)} onNavigate={navigate} t={t} />
       )}
     </>
   );
 }
 
-function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSearch }) {
+function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSearch, theme, onToggleTheme, lang, onChangeLang, t }) {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [langMenuOpen, setLangMenuOpen] = useState(false);
 
   useEffect(() => {
-    const closeDropdown = () => setOpenDropdown(null);
-    window.addEventListener("click", closeDropdown);
-    return () => window.removeEventListener("click", closeDropdown);
+    const closeAll = () => {
+      setOpenDropdown(null);
+      setLangMenuOpen(false);
+    };
+    window.addEventListener("click", closeAll);
+    return () => window.removeEventListener("click", closeAll);
   }, []);
 
   const navigate = (slug) => {
@@ -135,7 +219,10 @@ function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSea
     onNavigate(slug);
   };
 
-  const logoSrc = site?.assets?.logo || DEFAULT_ASSETS.logo;
+  const logoSrc = "/logo.png";
+
+  const langLabels = { uz: "O'Z", ru: "RU", en: "EN" };
+  const allLangs = ["uz", "ru", "en"];
 
   return (
     <header className="site-header">
@@ -167,10 +254,11 @@ function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSea
               e.currentTarget.src = DEFAULT_ASSETS.logo;
             }}
             alt="Oʻzyoʻlkoʻprik logotipi"
+            style={{ borderRadius: "50%", background: theme === "light" ? "rgba(0,0,0,0.06)" : "transparent" }}
           />
           <div className="brand-text">
             <strong>{site.brand.name}</strong>
-            <small>klasteri davlat muassasasi</small>
+            <small>{t.legalSmall}</small>
           </div>
         </button>
 
@@ -191,12 +279,57 @@ function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSea
         </nav>
 
         <div className="header-actions">
+          {/* Language Switcher */}
+          <div
+            className="lang-switcher"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="lang-switcher-btn"
+              onClick={() => setLangMenuOpen((prev) => !prev)}
+              aria-label="Tilni tanlang"
+              title="Tilni o'zgartirish"
+            >
+              <Languages size={15} />
+              <span>{langLabels[lang]}</span>
+            </button>
+            {langMenuOpen && (
+              <div className="lang-dropdown">
+                {allLangs.map((l) => (
+                  <button
+                    key={l}
+                    className={lang === l ? "lang-option active" : "lang-option"}
+                    onClick={() => {
+                      onChangeLang(l);
+                      setLangMenuOpen(false);
+                    }}
+                  >
+                    {langLabels[l]}
+                    {lang === l && <span className="lang-check">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Theme Toggle */}
+          <button
+            className="theme-toggle-btn"
+            onClick={onToggleTheme}
+            aria-label={theme === "dark" ? "Light rejimga o'tish" : "Dark rejimga o'tish"}
+            title={theme === "dark" ? "Light mode" : "Dark mode"}
+          >
+            {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+
+          {/* Search */}
           <button className="icon-button" aria-label="Qidiruv" onClick={onOpenSearch}>
             <Search size={18} />
           </button>
+
           <button className="contact-button" onClick={() => navigate("qayta-aloqa")}>
             <Phone size={16} />
-            <span>Aloqa</span>
+            <span>{t.contact}</span>
           </button>
           <button
             className="menu-button"
@@ -264,7 +397,7 @@ function SearchModal({ site, onClose, onNavigate }) {
     <div className="search-modal-backdrop" onClick={onClose}>
       <div className="search-modal" onClick={(e) => e.stopPropagation()}>
         <div className="search-modal-header">
-          <h3 style={{ fontSize: 18, color: "#fff" }}>Sayt boʻyicha qidiruv</h3>
+          <h3 style={{ fontSize: 18 }}>{t?.searchTitle || "Qidiruv"}</h3>
           <button onClick={onClose} className="icon-button">
             <X size={18} />
           </button>
@@ -275,7 +408,7 @@ function SearchModal({ site, onClose, onNavigate }) {
           <input
             type="text"
             className="search-input"
-            placeholder="Sahifa nomi yoki kalit soʻzni kiriting..."
+            placeholder={t?.searchPlaceholder || "Kalit so'z kiriting..."}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
@@ -293,10 +426,10 @@ function SearchModal({ site, onClose, onNavigate }) {
               }}
             >
               <div>
-                <strong style={{ color: "#fff", display: "block" }}>{page.title}</strong>
-                <small style={{ color: "#94a3b8" }}>{page.status || "Sayt sahifasi"}</small>
+                <strong style={{ display: "block" }}>{page.title}</strong>
+                <small style={{ color: "var(--text-muted)" }}>{page.status || t?.searchPageLabel || "Sayt sahifasi"}</small>
               </div>
-              <ArrowRight size={16} style={{ color: "#06b6d4" }} />
+              <ArrowRight size={16} style={{ color: "var(--accent-cyan)" }} />
             </button>
           ))}
         </div>
