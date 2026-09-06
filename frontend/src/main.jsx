@@ -35,11 +35,40 @@ import "./styles.css";
 // ============================================================
 const TRANSLATIONS = {
   uz: {
-    // System
+    // System & Brand
     loading: "Sayt ma'lumotlari yuklanmoqda...",
     backendCheck: "Backend ishlayotganini tekshiring: http://127.0.0.1:8000",
     pageNotFound: "Sahifa topilmadi",
     legalSmall: "klasteri davlat muassasasi",
+    brandName: "Oʻzyoʻlkoʻprik",
+    brandLegalName: "“Oʻzyoʻlkoʻprik” klasteri davlat muassasasi",
+    heroTagline: "Koʻprik va sunʼiy inshootlar uchun loyihalash, ishlab chiqarish, taʼmirlash va diagnostika ishlari",
+    heroIntro: "Oʻzbekiston Respublikasi Prezidentining 330-sonli qarori asosida tashkil topgan davlat muassasasi bo'lib Respublika boʻyicha koʻprik qurilishiga ta'aluqli barcha ishlarni amalga oshiradi.",
+    homePurpose: "Klasterning maqsadi – avtomobil yo‘llarida joylashgan ko‘prik va sun’iy inshootlarni ta’mirlash hamda texnik soz holatda saqlash maqsadida “loyihalash – tiklash – ekspluatatsiya qilish” ishlarini amalga oshirish hisoblanadi.",
+    contactHours: "09:00 dan 18:00 gacha",
+    bankText: "Oʻzbekiston Respublikasi TIF Milliy bank Bektemir tumani filiali BIK 00450 STIR 200 836 188",
+    addressText: "Toshkent shahri, Yashnobod tumani, Oʻrta Masjid MFY, Ohangrabo koʻchasi 12-uy 100146",
+    statusUnderDev: "Ishlab chiqish bosqichida.",
+
+    // Navigation items
+    nav: {
+      "bosh-sahifa": "Bosh sahifa",
+      "korxona-haqida": "Korxona haqida",
+      "korxona-ustavi": "Korxona ustavi",
+      "tashkiliy-tuzilma": "Tashkiliy tuzilma",
+      "rahbariyat": "Rahbariyat",
+      "zavod-haqida": "Zavod haqida",
+      "katalog": "Katalog",
+      "mahsulotlar-katalogi": "Mahsulotlar katalogi",
+      "nomenklatura": "Nomenklatura",
+      "narx-navo": "Narx-navo",
+      "bosh-ish-orinlari": "Boʻsh ish oʻrinlari",
+      "filiallar": "Filiallar",
+      "elonlar": "Eʼlonlar",
+      "qayta-aloqa": "Qayta aloqa",
+      "mulkchilik-shakli": "Mulkchilik shakli",
+      "vazifalar": "Vazifalar",
+    },
 
     // Header
     contact: "Aloqa",
@@ -77,6 +106,7 @@ const TRANSLATIONS = {
     capEyebrowFallback: "Yo'nalishlar",
     capTitleFallback: "Ko'prik infratuzilmasi uchun asosiy xizmat bloklari",
     capDesc: "Muassasa tomonidan amalga oshiriladigan yuqori aniqlikdagi texnik va muhandislik xizmatlari yo'nalishi.",
+    capabilities: ["Loyihalash", "Temir-beton qurilmalarini ishlab chiqarish", "Ta'mirlash va tiklash", "Diagnostika ishlari"],
     workflowEyebrowFallback: "Ish Oqimi",
     workflowTitleFallback: "Texnik qarordan amaliy natijagacha",
     workflowSteps: ["Diagnostika", "Loyihalash", "Ishlab chiqarish", "Ekspluatatsiya"],
@@ -87,6 +117,20 @@ const TRANSLATIONS = {
     tasksCount: (n) => `${n} ta faoliyat yo'nalishi`,
     institutionProcess: "Muassasa Jarayoni",
     institutionProcessDesc: "Diagnostika, ishlab chiqarish, tiklash va texnik soz holatda saqlash ishlari bitta operatsion tizimda birlashadi.",
+    tasksList: [
+      "avtomobil yo‘llarida qurish, qayta qurish, ta’mirlash va saqlash ishlarini amalga oshirish;",
+      "ko‘prik va sun’iy inshootlarni muntazam ravishda shartnoma asosida diagnostika qilish, pasportlashtirish va texnik ko‘rikdan o‘tkazib borish;",
+      "diagnostika qilish natijalariga asosan aniqlanadigan avariya holatidagi ta’mirtalab ko‘prik va sun’iy inshootlarni loyihalashtirish, ta’mirlash va tiklash ishlarini amalga oshirish;",
+      "ko‘prik va sun’iy inshootlarni ta’mirlash hamda tiklash uchun zarur bo‘ladigan materiallarni, jumladan temir-beton qurilmalari va jihozlarni ishlab chiqarish;",
+      "umumiy foydalanishdagi avtomobil yo‘llarida joylashgan ko‘prik va sun’iy inshootlarni texnik soz holatda saqlash;",
+      "zamonaviy texnika va texnologiyalarni qo‘llash orqali raqobatbardosh, sifatli mahsulotlar ishlab chiqarish va yetkazib berish;",
+      "temir-beton, tovar-beton va noruda mahsulotlarini ishlab chiqarish va sotish;",
+      "avtotransport, temir yo‘l transporti va boshqa transport vositalari bilan yuk tashish xizmatlarini ko‘rsatish;",
+      "o‘zi ishlab chiqargan mahsulotlarni o‘zaro tuzilgan shartnomalar asosida mulkchilik shaklidan qat’iy nazar korxona, tashkilotlarga va fuqarolarga sotish;",
+      "temir yo‘l xizmatlarini, shu jumladan temir yo‘l yuk hovlisi xizmatlarini ko‘rsatish;",
+      "avtomobil transportida yo‘lovchi tashish;",
+      "noruda mahsulotlarini qazib olish, qayta ishlash va sotish;"
+    ],
 
     // Labels
     pageLabel: "Sahifa",
@@ -117,6 +161,15 @@ const TRANSLATIONS = {
 
     // Announcement
     emailLabel: "Tijorat takliflarini yuborish uchun e-pochta:",
+    announcementIntro: "“O‘zyo‘lko‘prik klaster” DM quyidagi uskunalar yetkazib berish bo‘yicha tanlov savdolarini e’lon qiladi:",
+    announcementItems: [
+      "Kozlovoy kran KS-100 t – 2 dona",
+      "Ko'prikli kran 20/5 t – 2 dona",
+      "Ko'prikli kran 10 t – 2 dona",
+      "Beton qorgich BSU-60 m3/soat – 1 dona",
+      "Armatura to'g'rilash va kesish uskunasi – 2 dona",
+      "Avtomatik armatura bukuvchi uskuna – 2 dona"
+    ],
 
     // Footer
     footerContact: "Aloqa sahifasi",
@@ -151,11 +204,40 @@ const TRANSLATIONS = {
   },
 
   ru: {
-    // System
+    // System & Brand
     loading: "Загрузка данных сайта...",
     backendCheck: "Проверьте работу сервера: http://127.0.0.1:8000",
     pageNotFound: "Страница не найдена",
     legalSmall: "государственное учреждение кластера",
+    brandName: "«Узйулкуприк»",
+    brandLegalName: "Государственное учреждение кластера «Узйулкуприк»",
+    heroTagline: "Проектирование, производство, ремонт и диагностика мостов и искусственных сооружений",
+    heroIntro: "Государственное учреждение, созданное на основании постановления Президента Республики Узбекистан №330, осуществляет все виды работ по мостостроению по всей Республике.",
+    homePurpose: "Цель кластера – реализация цикла «проектирование – восстановление – эксплуатация» для ремонта и поддержания в технически исправном состоянии мостов и искусственных сооружений на автомобильных дорогах.",
+    contactHours: "с 09:00 до 18:00",
+    bankText: "Национальный банк ВЭД Республики Узбекистан, Бектемирский филиал, БИК 00450, ИНН 200 836 188",
+    addressText: "г. Ташкент, Яшнабадский район, сходы граждан Урта Масжид, ул. Оханграбо, д. 12, 100146",
+    statusUnderDev: "На стадии разработки.",
+
+    // Navigation items
+    nav: {
+      "bosh-sahifa": "Главная",
+      "korxona-haqida": "О предприятии",
+      "korxona-ustavi": "Устав предприятия",
+      "tashkiliy-tuzilma": "Организационная структура",
+      "rahbariyat": "Руководство",
+      "zavod-haqida": "О заводе",
+      "katalog": "Каталог",
+      "mahsulotlar-katalogi": "Каталог продукции",
+      "nomenklatura": "Номенклатура",
+      "narx-navo": "Прайс-лист",
+      "bosh-ish-orinlari": "Вакансии",
+      "filiallar": "Филиалы",
+      "elonlar": "Объявления",
+      "qayta-aloqa": "Обратная связь",
+      "mulkchilik-shakli": "Форма собственности",
+      "vazifalar": "Задачи",
+    },
 
     // Header
     contact: "Связь",
@@ -193,6 +275,7 @@ const TRANSLATIONS = {
     capEyebrowFallback: "Направления",
     capTitleFallback: "Основные блоки услуг для мостовой инфраструктуры",
     capDesc: "Направление высокоточных технических и инженерных услуг, реализуемых учреждением.",
+    capabilities: ["Проектирование", "Производство железобетонных конструкций", "Ремонт и восстановление", "Диагностические работы"],
     workflowEyebrowFallback: "Рабочий Процесс",
     workflowTitleFallback: "От технического решения к практическому результату",
     workflowSteps: ["Диагностика", "Проектирование", "Производство", "Эксплуатация"],
@@ -203,6 +286,20 @@ const TRANSLATIONS = {
     tasksCount: (n) => `${n} направлений деятельности`,
     institutionProcess: "Процесс Учреждения",
     institutionProcessDesc: "Диагностика, производство, восстановление и техническое обслуживание объединены в одной операционной системе.",
+    tasksList: [
+      "Строительство, реконструкция, ремонт и содержание автомобильных дорог;",
+      "Регулярная договорная диагностика, паспортизация и технический осмотр мостов и искусственных сооружений;",
+      "Проектирование, ремонт и восстановление аварийных мостов и сооружений, выявленных в ходе диагностики;",
+      "Производство материалов, включая железобетонные конструкции и оборудование, для ремонта и восстановления;",
+      "Поддержание в технически исправном состоянии мостов и искусственных сооружений общего пользования;",
+      "Производство и поставка конкурентоспособной, качественной продукции с применением передовых технологий;",
+      "Производство и реализация железобетонных изделий, товарного бетона и нерудных материалов;",
+      "Оказание услуг грузоперевозок автомобильным, железнодорожным и иными видами транспорта;",
+      "Реализация собственной продукции предприятиям, организациям и гражданам независимо от формы собственности;",
+      "Предоставление железнодорожных услуг, включая обслуживание грузового двора;",
+      "Пассажирские перевозки автомобильным транспортом;",
+      "Добыча, переработка и реализация нерудных полезных ископаемых;"
+    ],
 
     // Labels
     pageLabel: "Страница",
@@ -228,11 +325,20 @@ const TRANSLATIONS = {
     email: "Электронная почта",
     workHours: "Рабочее время",
     bankDetails: "Банковские реквизиты",
-    address: "Адрес",
-    mapTitle: "O'zyo'lko'prik на карте",
+    address: "Адрес расположения",
+    mapTitle: "«Узйулкуприк» на карте",
 
     // Announcement
     emailLabel: "Электронная почта для коммерческих предложений:",
+    announcementIntro: "ГУ «Узйулкуприк кластер» объявляет конкурсные торги на поставку следующего оборудования:",
+    announcementItems: [
+      "Кран козловой КС-100 т – 2 шт",
+      "Кран мостовой 20/5 т – 2 шт",
+      "Кран мостовой 10 т – 2 шт",
+      "Бетоносмесительная установка БСУ-60 м3/час – 1 шт",
+      "Станок для правки и резки арматуры – 2 шт",
+      "Автоматический станок для гибки арматуры – 2 шт"
+    ],
 
     // Footer
     footerContact: "Страница контактов",
@@ -267,11 +373,40 @@ const TRANSLATIONS = {
   },
 
   en: {
-    // System
+    // System & Brand
     loading: "Loading site data...",
     backendCheck: "Check that backend is running: http://127.0.0.1:8000",
     pageNotFound: "Page not found",
     legalSmall: "state cluster institution",
+    brandName: "“Uzyolkorpik”",
+    brandLegalName: "State Institution of “Uzyolkorpik” Cluster",
+    heroTagline: "Design, production, repair and diagnostics for bridges and artificial structures",
+    heroIntro: "A state institution established under Resolution No. 330 of the President of the Republic of Uzbekistan, performing all works related to bridge construction across the Republic.",
+    homePurpose: "The goal of the cluster is to implement the 'design – restoration – operation' cycle for repairing and maintaining bridges and artificial structures on highways in good technical condition.",
+    contactHours: "09:00 to 18:00",
+    bankText: "National Bank for Foreign Economic Activity of Uzbekistan, Bektemir branch, BIC 00450, TIN 200 836 188",
+    addressText: "12 Ohangrabo Street, Orta Masjid MFC, Yashnabad District, Tashkent 100146",
+    statusUnderDev: "Under development.",
+
+    // Navigation items
+    nav: {
+      "bosh-sahifa": "Home",
+      "korxona-haqida": "About Enterprise",
+      "korxona-ustavi": "Enterprise Charter",
+      "tashkiliy-tuzilma": "Organizational Structure",
+      "rahbariyat": "Management",
+      "zavod-haqida": "About Plant",
+      "katalog": "Catalog",
+      "mahsulotlar-katalogi": "Products Catalog",
+      "nomenklatura": "Nomenclature",
+      "narx-navo": "Price List",
+      "bosh-ish-orinlari": "Vacancies",
+      "filiallar": "Branches",
+      "elonlar": "Announcements",
+      "qayta-aloqa": "Contact",
+      "mulkchilik-shakli": "Ownership Form",
+      "vazifalar": "Tasks",
+    },
 
     // Header
     contact: "Contact",
@@ -309,6 +444,7 @@ const TRANSLATIONS = {
     capEyebrowFallback: "Directions",
     capTitleFallback: "Core service blocks for bridge infrastructure",
     capDesc: "High-precision technical and engineering service direction implemented by the institution.",
+    capabilities: ["Engineering & Design", "Reinforced Concrete Production", "Repair & Restoration", "Diagnostics & Inspection"],
     workflowEyebrowFallback: "Workflow",
     workflowTitleFallback: "From technical decision to practical result",
     workflowSteps: ["Diagnostics", "Design", "Production", "Operation"],
@@ -319,6 +455,20 @@ const TRANSLATIONS = {
     tasksCount: (n) => `${n} activity directions`,
     institutionProcess: "Institution Process",
     institutionProcessDesc: "Diagnostics, production, restoration and maintenance are unified in one operational system.",
+    tasksList: [
+      "Construction, reconstruction, repair, and maintenance of highways and roads;",
+      "Regular contractual diagnostics, passportization, and technical inspection of bridges and artificial structures;",
+      "Design, repair, and restoration of emergency bridges and structures identified through diagnostics;",
+      "Production of materials, including reinforced concrete structures and equipment needed for repair and restoration;",
+      "Maintaining bridges and artificial structures on public roads in good technical condition;",
+      "Production and supply of competitive, high-quality products using advanced technologies;",
+      "Production and sale of reinforced concrete items, ready-mix concrete, and non-metallic materials;",
+      "Freight transportation services by road, rail, and other transport modes;",
+      "Sale of manufactured products to enterprises, organizations, and citizens regardless of ownership form;",
+      "Provision of railway services, including freight yard operations;",
+      "Passenger transportation by motor vehicles;",
+      "Extraction, processing, and sale of non-metallic mineral resources;"
+    ],
 
     // Labels
     pageLabel: "Page",
@@ -345,10 +495,19 @@ const TRANSLATIONS = {
     workHours: "Working hours",
     bankDetails: "Bank details",
     address: "Location address",
-    mapTitle: "O'zyo'lko'prik on the map",
+    mapTitle: "“Uzyolkorpik” on the map",
 
     // Announcement
     emailLabel: "Email for commercial proposals:",
+    announcementIntro: "State Institution “Uzyolkorpik Cluster” announces an open tender for the supply of the following equipment:",
+    announcementItems: [
+      "Gantry crane KS-100 t – 2 pcs",
+      "Overhead crane 20/5 t – 2 pcs",
+      "Overhead crane 10 t – 2 pcs",
+      "Concrete batching plant BSU-60 m3/h – 1 pc",
+      "Rebar straightening and cutting machine – 2 pcs",
+      "Automatic rebar bending machine – 2 pcs"
+    ],
 
     // Footer
     footerContact: "Contact page",
@@ -382,6 +541,58 @@ const TRANSLATIONS = {
     branchDesc: "About the branch:",
   },
 };
+
+// Helper translation functions
+function getNavTitle(slug, label, t) {
+  if (slug && t?.nav?.[slug]) return t.nav[slug];
+  if (label) {
+    const norm = label.toLowerCase().trim().replace(/['ʻʼ`]/g, "'");
+    for (const [key, val] of Object.entries(t?.nav || {})) {
+      if (key.toLowerCase().replace(/['ʻʼ`]/g, "'") === norm) return val;
+    }
+  }
+  return label;
+}
+
+function translateLeaderPosition(pos, lang) {
+  if (!pos || lang === "uz") return pos;
+  const p = pos.toLowerCase();
+  if (p.includes("bosh direktor")) {
+    return lang === "ru" ? "Генеральный директор" : "General Director";
+  }
+  if (p.includes("bosh muhandis") || p.includes("bosh muhandisi")) {
+    return lang === "ru" ? "Заместитель директора — Главный инженер" : "Deputy Director — Chief Engineer";
+  }
+  if (p.includes("direktor oʻrinbosari") || p.includes("direktor o'rinbosari") || p.includes("direktor urinbosari")) {
+    return lang === "ru" ? "Заместитель директора" : "Deputy Director";
+  }
+  return pos;
+}
+
+function translateLeaderDetail(text, lang) {
+  if (!text || lang === "uz") return text;
+  let res = text;
+  if (lang === "ru") {
+    res = res
+      .replace(/viloyati/gi, "область")
+      .replace(/shaxri|shahri/gi, "г.")
+      .replace(/tumani/gi, "район")
+      .replace(/Toshkent avtomobil yo'llari instituti/gi, "Ташкентский автодорожный институт")
+      .replace(/Toshkent Politexnika instituti/gi, "Ташкентский политехнический институт")
+      .replace(/Namangan muhandislik-qurilish instituti/gi, "Наманганский инженерно-строительный институт")
+      .replace(/Toshkent iqtisodiyot universiteti/gi, "Ташкентский государственный экономический университет");
+  } else if (lang === "en") {
+    res = res
+      .replace(/viloyati/gi, "region")
+      .replace(/shaxri|shahri/gi, "city")
+      .replace(/tumani/gi, "district")
+      .replace(/Toshkent avtomobil yo'llari instituti/gi, "Tashkent Automobile and Road Institute")
+      .replace(/Toshkent Politexnika instituti/gi, "Tashkent Polytechnic Institute")
+      .replace(/Namangan muhandislik-qurilish instituti/gi, "Namangan Civil Engineering Institute")
+      .replace(/Toshkent iqtisodiyot universiteti/gi, "Tashkent State University of Economics");
+  }
+  return res;
+}
 
 // Pristine Default High-Tech Bridge Plant & Concrete Cluster Asset
 const DEFAULT_ASSETS = {
@@ -538,11 +749,11 @@ function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSea
         <div className="top-strip-info">
           <span className="top-strip-item">
             <Building2 size={14} />
-            {site.brand.legalName}
+            {t.brandLegalName || site.brand.legalName}
           </span>
           <span className="top-strip-item">
             <Clock3 size={14} />
-            {site.contact.hours}
+            {t.contactHours || site.contact.hours}
           </span>
         </div>
         <div className="top-strip-info">
@@ -565,7 +776,7 @@ function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSea
             style={{ borderRadius: "50%", background: theme === "light" ? "rgba(0,0,0,0.06)" : "transparent" }}
           />
           <div className="brand-text">
-            <strong>{site.brand.name}</strong>
+            <strong>{t.brandName || site.brand.name}</strong>
             <small>{t.legalSmall}</small>
           </div>
         </button>
@@ -573,7 +784,7 @@ function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSea
         <nav className={menuOpen ? "main-nav is-open" : "main-nav"} aria-label="Asosiy menyu">
           {site.navigation.map((item) => (
             <NavItem
-              key={item.label}
+              key={item.slug || item.label}
               item={item}
               activeSlug={activeSlug}
               onNavigate={navigate}
@@ -582,6 +793,7 @@ function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSea
                 event.stopPropagation();
                 setOpenDropdown(openDropdown === item.slug ? null : item.slug);
               }}
+              t={t}
             />
           ))}
         </nav>
@@ -652,7 +864,7 @@ function Header({ site, activeSlug, onNavigate, menuOpen, setMenuOpen, onOpenSea
   );
 }
 
-function NavItem({ item, activeSlug, onNavigate, isOpen, onToggle }) {
+function NavItem({ item, activeSlug, onNavigate, isOpen, onToggle, t }) {
   const childActive = item.children?.some((child) => child.slug === activeSlug);
   const hasChildren = Boolean(item.children?.length);
 
@@ -671,14 +883,14 @@ function NavItem({ item, activeSlug, onNavigate, isOpen, onToggle }) {
         onClick={handleClick}
         aria-expanded={hasChildren ? isOpen : undefined}
       >
-        {item.label}
+        {getNavTitle(item.slug, item.label, t)}
         {hasChildren && <ChevronDown size={14} />}
       </button>
       {hasChildren && isOpen && (
         <div className="nav-dropdown" onClick={(event) => event.stopPropagation()}>
           {item.children.map((child) => (
             <button key={child.slug} onClick={() => onNavigate(child.slug)}>
-              {child.label}
+              {getNavTitle(child.slug, child.label, t)}
             </button>
           ))}
         </div>
@@ -687,7 +899,7 @@ function NavItem({ item, activeSlug, onNavigate, isOpen, onToggle }) {
   );
 }
 
-function SearchModal({ site, onClose, onNavigate }) {
+function SearchModal({ site, onClose, onNavigate, t }) {
   const [query, setQuery] = useState("");
 
   const results = useMemo(() => {
@@ -696,10 +908,11 @@ function SearchModal({ site, onClose, onNavigate }) {
     return site.pages.filter(
       (p) =>
         p.title?.toLowerCase().includes(q) ||
+        getNavTitle(p.slug, p.title, t)?.toLowerCase().includes(q) ||
         p.slug?.toLowerCase().includes(q) ||
         p.status?.toLowerCase().includes(q)
     );
-  }, [site, query]);
+  }, [site, query, t]);
 
   return (
     <div className="search-modal-backdrop" onClick={onClose}>
@@ -734,7 +947,7 @@ function SearchModal({ site, onClose, onNavigate }) {
               }}
             >
               <div>
-                <strong style={{ display: "block" }}>{page.title}</strong>
+                <strong style={{ display: "block" }}>{getNavTitle(page.slug, page.title, t)}</strong>
                 <small style={{ color: "var(--text-muted)" }}>{page.status || t?.searchPageLabel || "Sayt sahifasi"}</small>
               </div>
               <ArrowRight size={16} style={{ color: "var(--accent-cyan)" }} />
@@ -746,7 +959,7 @@ function SearchModal({ site, onClose, onNavigate }) {
   );
 }
 
-function PageRenderer({ page, site, onNavigate, t }) {
+function PageRenderer({ page, site, onNavigate, t, lang }) {
   if (!page) {
     return (
       <section className="page-shell">
@@ -759,10 +972,10 @@ function PageRenderer({ page, site, onNavigate, t }) {
   }
 
   if (page.type === "home") return <Home site={site} onNavigate={onNavigate} t={t} />;
-  if (page.type === "leaders") return <Leaders page={page} site={site} t={t} />;
+  if (page.type === "leaders") return <Leaders page={page} site={site} t={t} lang={lang} />;
   if (page.type === "document") return <DocumentPage page={page} site={site} t={t} />;
   if (page.type === "announcement") return <Announcement page={page} t={t} />;
-  if (page.type === "contact") return <Contact site={site} t={t} />;
+  if (page.type === "contact") return <Contact site={site} t={t} lang={lang} />;
   if (page.slug === "narx-navo") return <PriceGridPage page={page} site={site} t={t} />;
   if (page.type === "filiallar" || page.slug === "filiallar") return <FiliallarPage page={page} site={site} t={t} />;
   return <StatusPage page={page} site={site} t={t} />;
@@ -779,6 +992,9 @@ function Home({ site, onNavigate, t }) {
   const heroSrc = site?.assets?.hero || DEFAULT_ASSETS.hero;
   const plantSrc = site?.assets?.plant || DEFAULT_ASSETS.plant;
 
+  const currentCapabilities = t.capabilities || site.home.capabilities;
+  const currentTasks = t.tasksList || site.home.tasks;
+
   return (
     <>
       <section className="hero">
@@ -788,9 +1004,9 @@ function Home({ site, onNavigate, t }) {
               <ShieldCheck size={16} />
               {t.heroKicker}
             </div>
-            <h1 className="hero-title">{site.brand.legalName}</h1>
-            <div className="hero-tagline">{site.brand.tagline}</div>
-            <p className="hero-lead">{site.home.intro}</p>
+            <h1 className="hero-title">{t.brandLegalName || site.brand.legalName}</h1>
+            <div className="hero-tagline">{t.heroTagline || site.brand.tagline}</div>
+            <p className="hero-lead">{t.heroIntro || site.home.intro}</p>
 
             <div className="hero-actions">
               <button className="btn-primary" onClick={() => onNavigate("katalog")}>
@@ -843,11 +1059,11 @@ function Home({ site, onNavigate, t }) {
 
       <section className="metrics-band">
         <div className="metric-item">
-          <div className="metric-number">{site.home.capabilities.length}</div>
+          <div className="metric-number">{currentCapabilities.length}</div>
           <div className="metric-label">{t.metricDir}</div>
         </div>
         <div className="metric-item">
-          <div className="metric-number">{site.home.tasks.length}</div>
+          <div className="metric-number">{currentTasks.length}</div>
           <div className="metric-label">{t.metricTask}</div>
         </div>
         <div className="metric-item">
@@ -866,7 +1082,7 @@ function Home({ site, onNavigate, t }) {
           <h2>{site.home.modelTitle || t.modelTitleFallback}</h2>
         </div>
         <div className="glass-panel" style={{ padding: 36, display: "grid", gap: 20 }}>
-          <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--text-muted)" }}>{site.home.purpose}</p>
+          <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--text-muted)" }}>{t.homePurpose || site.home.purpose}</p>
           <div
             style={{
               padding: 20,
@@ -895,7 +1111,7 @@ function Home({ site, onNavigate, t }) {
           <h2>{site.home.capabilitiesTitle || t.capTitleFallback}</h2>
         </div>
         <div className="capability-grid">
-          {site.home.capabilities.map((capability, index) => (
+          {currentCapabilities.map((capability, index) => (
             <article className="capability-card" key={capability}>
               <div className="capability-top">
                 <div className="capability-icon-wrap">
@@ -939,7 +1155,7 @@ function Home({ site, onNavigate, t }) {
             />
             <div className="task-visual-info">
               <strong>{t.operationalTasks}</strong>
-              <span>{t.tasksCount(site.home.tasks.length)}</span>
+              <span>{t.tasksCount(currentTasks.length)}</span>
             </div>
           </div>
 
@@ -949,7 +1165,7 @@ function Home({ site, onNavigate, t }) {
               <h2>{site.home.tasksTitle || t.tasksTitleFallback}</h2>
             </div>
             <div className="task-list">
-              {site.home.tasks.map((task, index) => (
+              {currentTasks.map((task, index) => (
                 <div className="task-row" key={task}>
                   <span className="task-row-num">{String(index + 1).padStart(2, "0")}</span>
                   <p>{task}</p>
@@ -971,10 +1187,11 @@ function IconForIndex({ index }) {
 
 function StatusPage({ page, site, t }) {
   const pageImgSrc = page.imageUrl || site?.assets?.hero || DEFAULT_ASSETS.hero;
+  const statusText = page.status?.includes("Ishlab chiqish") ? t.statusUnderDev : (page.status || t.noInfo);
 
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label={t.pageLabel} />
+      <PageHero title={getNavTitle(page.slug, page.title, t)} label={t.pageLabel} />
       <div className="glass-panel" style={{ padding: 48, display: "grid", gap: 24 }}>
         
         {page.content ? (
@@ -982,7 +1199,7 @@ function StatusPage({ page, site, t }) {
             {page.content}
           </p>
         ) : (
-          <h2 style={{ fontSize: 24, color: "var(--text-main)", textAlign: "center" }}>{page.status || t.noInfo}</h2>
+          <h2 style={{ fontSize: 24, color: "var(--text-main)", textAlign: "center" }}>{statusText}</h2>
         )}
 
         {page.fileUrl && (
@@ -1015,10 +1232,10 @@ function StatusPage({ page, site, t }) {
   );
 }
 
-function Leaders({ page, site, t }) {
+function Leaders({ page, site, t, lang }) {
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label={t.aboutLabel} />
+      <PageHero title={getNavTitle(page.slug, page.title, t)} label={t.aboutLabel} />
       <div className="leaders-grid">
         {page.leaders.map((leader, idx) => {
           const leaderImg =
@@ -1043,12 +1260,12 @@ function Leaders({ page, site, t }) {
               )}
               <div className="leader-info">
                 <h2>{leader.name}</h2>
-                <p className="position">{leader.position}</p>
+                <p className="position">{translateLeaderPosition(leader.position, lang)}</p>
                 <dl>
                   <dt>{t.bornLabel}</dt>
-                  <dd>{leader.born || t.noData}</dd>
+                  <dd>{translateLeaderDetail(leader.born, lang) || t.noData}</dd>
                   <dt>{t.educationLabel}</dt>
-                  <dd>{leader.education || t.noData}</dd>
+                  <dd>{translateLeaderDetail(leader.education, lang) || t.noData}</dd>
                 </dl>
               </div>
             </article>
@@ -1073,7 +1290,7 @@ function DocumentPage({ page, site, t }) {
     items = [
       {
         id: "page-file",
-        title: page.title,
+        title: getNavTitle(page.slug, page.title, t),
         fileUrl: page.fileUrl,
         embedUrl: page.fileUrl,
       }
@@ -1082,7 +1299,7 @@ function DocumentPage({ page, site, t }) {
 
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label={t.zavodLabel} />
+      <PageHero title={getNavTitle(page.slug, page.title, t)} label={t.zavodLabel} />
       <div style={{ display: "grid", gap: 32 }}>
         
         {pageDesc && (
@@ -1152,13 +1369,16 @@ function DocumentPage({ page, site, t }) {
 }
 
 function Announcement({ page, t }) {
+  const introText = t.announcementIntro || page.intro;
+  const items = t.announcementItems || page.items;
+
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label={t.announcementLabel} />
+      <PageHero title={getNavTitle(page.slug, page.title, t)} label={t.announcementLabel} />
       <div className="announcement-box">
-        <p style={{ fontSize: 16, color: "var(--text-muted)", marginBottom: 24 }}>{page.intro}</p>
+        <p style={{ fontSize: 16, color: "var(--text-muted)", marginBottom: 24 }}>{introText}</p>
         <div className="equipment-grid">
-          {page.items.map((item) => (
+          {items.map((item) => (
             <div className="equipment-badge" key={item}>
               <Wrench size={18} style={{ color: "var(--accent-cyan)" }} />
               <span>{item}</span>
@@ -1179,29 +1399,22 @@ function Announcement({ page, t }) {
   );
 }
 
-function Contact({ site }) {
+function Contact({ site, t, lang }) {
   return (
     <section className="page-shell">
-      <PageHero title="Bogʻlanish va Manzil" label="Qayta Aloqa" />
+      <PageHero title={t.contactTitle} label={t.contactLabel} />
       <div className="contact-layout">
         <div className="contact-cards">
-          <InfoCard icon={Phone} title="Telefon raqamlar" lines={site.contact.phones} />
-          <InfoCard icon={Mail} title="E-pochtamiz" lines={[site.contact.email]} />
-          <InfoCard icon={Clock3} title="Ish vaqti" lines={[site.contact.hours]} />
-          <InfoCard icon={BriefcaseBusiness} title="Hisob-raqam" lines={[site.contact.bank]} />
-          <InfoCard icon={MapPin} title="Joylashuv manzili" lines={[site.contact.address]} />
+          <InfoCard icon={Phone} title={t.phones} lines={site.contact.phones} />
+          <InfoCard icon={Mail} title={t.email} lines={[site.contact.email]} />
+          <InfoCard icon={Clock3} title={t.workHours} lines={[t.contactHours || site.contact.hours]} />
+          <InfoCard icon={BriefcaseBusiness} title={t.bankDetails} lines={[t.bankText || site.contact.bank]} />
+          <InfoCard icon={MapPin} title={t.address} lines={[t.addressText || site.contact.address]} />
         </div>
         <div className="map-panel">
           <iframe
-            title="Oʻzyoʻlkoʻprik xaritada"
-            src={(
-              site.contact.map &&
-              !site.contact.map.includes("maps-api-ssl") &&
-              site.contact.map.includes("output=embed")
-            )
-              ? site.contact.map
-              : "https://www.google.com/maps?q=41.251234,69.354249&output=embed&z=17&hl=uz"
-            }
+            title={t.mapTitle}
+            src={`https://www.google.com/maps?q=41.251234,69.354249&output=embed&z=17&hl=${lang || "uz"}`}
             loading="lazy"
             allowFullScreen
             referrerPolicy="no-referrer-when-downgrade"
@@ -1242,8 +1455,8 @@ function Footer({ site, onNavigate, t }) {
   return (
     <footer className="footer">
       <div className="footer-brand">
-        <strong>{site.brand.legalName}</strong>
-        <p>{site.brand.tagline}</p>
+        <strong>{t.brandLegalName || site.brand.legalName}</strong>
+        <p>{t.heroTagline || site.brand.tagline}</p>
         <div className="footer-links">
           <a href={API_DOCS.swagger} target="_blank" rel="noreferrer">API (Swagger)</a>
           <a href={API_DOCS.redoc} target="_blank" rel="noreferrer">API (ReDoc)</a>
@@ -1266,7 +1479,7 @@ function PriceGridPage({ page, site, t }) {
 
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label={t.infoLabel} />
+      <PageHero title={getNavTitle(page.slug, page.title, t)} label={t.infoLabel} />
 
       {page.content && (
         <div style={{ textAlign: "center", maxWidth: 900, margin: "0 auto 32px auto" }}>
@@ -1513,7 +1726,7 @@ function FiliallarPage({ page, site, t }) {
 
   return (
     <section className="page-shell">
-      <PageHero title={page?.title || t.filiallarTitle} label={t.branchesLabel} />
+      <PageHero title={getNavTitle(page?.slug, page?.title, t) || t.filiallarTitle} label={t.branchesLabel} />
 
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gap: 32 }}>
         {/* Banner va Tavsif */}
