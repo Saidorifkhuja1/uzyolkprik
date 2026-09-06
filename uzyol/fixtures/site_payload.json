@@ -64,7 +64,7 @@
     "bank": "Oʻzbekiston Respublikasi TIF Milliy bank Bektemir tumani filiali BIK 00450 STIR 200 836 188",
     "address": "Toshkent shahri, Yashnobod tumani, Oʻrta Masjid MFY, Ohangrabo koʻchasi 12-uy 100146",
     "hours": "09:00 dan 18:00 gacha",
-    "map": "https://maps-api-ssl.google.com/maps?hl=en-US&ll=41.25147,69.354269&output=embed&q=41.251234,69.354249"
+    "map": "https://www.google.com/maps?q=41.251234,69.354249&output=embed&z=17&hl=uz"
   },
   "pages": [
     {"slug": "bosh-sahifa", "title": "Bosh sahifa", "type": "home"},

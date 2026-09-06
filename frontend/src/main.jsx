@@ -884,7 +884,21 @@ function Contact({ site }) {
           <InfoCard icon={MapPin} title="Joylashuv manzili" lines={[site.contact.address]} />
         </div>
         <div className="map-panel">
-          <iframe title="Oʻzyoʻlkoʻprik xaritada" src={site.contact.map} loading="lazy" />
+          <iframe
+            title="Oʻzyoʻlkoʻprik xaritada"
+            src={(
+              site.contact.map &&
+              !site.contact.map.includes("maps-api-ssl") &&
+              site.contact.map.includes("output=embed")
+            )
+              ? site.contact.map
+              : "https://www.google.com/maps?q=41.251234,69.354249&output=embed&z=17&hl=uz"
+            }
+            loading="lazy"
+            allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
+            style={{ border: 0 }}
+          />
         </div>
       </div>
     </section>
