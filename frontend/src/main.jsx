@@ -35,43 +35,351 @@ import "./styles.css";
 // ============================================================
 const TRANSLATIONS = {
   uz: {
-    loading: "Sayt ma\u02bclumotlari yuklanmoqda...",
+    // System
+    loading: "Sayt ma'lumotlari yuklanmoqda...",
     backendCheck: "Backend ishlayotganini tekshiring: http://127.0.0.1:8000",
     pageNotFound: "Sahifa topilmadi",
-    contact: "Aloqa",
-    searchPlaceholder: "Sahifa nomi yoki kalit s\u02bcozni kiriting...",
-    searchTitle: "Sayt b\u02bcyicha qidiruv",
-    searchPageLabel: "Sayt sahifasi",
     legalSmall: "klasteri davlat muassasasi",
-    heroBtn1: "Katalogni k\u02bcrishch",
-    heroBtn2: "Bog\u02bclanish",
-    lang: "UZ",
+
+    // Header
+    contact: "Aloqa",
+    searchTitle: "Sayt bo'yicha qidiruv",
+    searchPlaceholder: "Sahifa nomi yoki kalit so'zni kiriting...",
+    searchPageLabel: "Sayt sahifasi",
+
+    // Hero
+    heroKicker: "Respublika Ko'prik Infratuzilmasi",
+    heroBtn1: "Katalogni ko'rish",
+    heroBtn2: "Bog'lanish",
+    heroBadge: "Yagona Klaster Modeli",
+    heroProcess: "Loyihalash → Ishlab chiqarish → Ekspluatatsiya",
+    heroImgAlt: "Ko'prik va ishlab chiqarish obyekti",
+
+    // Quick links
+    ql_catalog: "Katalog",
+    ql_catalog_detail: "Mahsulotlar va hujjatlar",
+    ql_leaders: "Rahbariyat",
+    ql_leaders_detail: "Muassasa mas'ullari",
+    ql_elonlar: "E'lonlar",
+    ql_elonlar_detail: "Tanlovlar va xaridlar",
+    ql_contact: "Qayta aloqa",
+    ql_contact_detail: "Manzil va telefonlar",
+
+    // Metrics
+    metricDir: "Asosiy Yo'nalish",
+    metricTask: "Klaster Vazifasi",
+    metricContact: "Aloqa Kanallari",
+    metricControl: "To'liq Nazorat",
+
+    // Home sections
+    modelFallback: "Klaster Modeli",
+    modelTitleFallback: "Loyihadan tayyor konstruksiyagacha yagona boshqaruv",
+    capEyebrowFallback: "Yo'nalishlar",
+    capTitleFallback: "Ko'prik infratuzilmasi uchun asosiy xizmat bloklari",
+    capDesc: "Muassasa tomonidan amalga oshiriladigan yuqori aniqlikdagi texnik va muhandislik xizmatlari yo'nalishi.",
+    workflowEyebrowFallback: "Ish Oqimi",
+    workflowTitleFallback: "Texnik qarordan amaliy natijagacha",
+    workflowSteps: ["Diagnostika", "Loyihalash", "Ishlab chiqarish", "Ekspluatatsiya"],
+    workflowStepDesc: "Ko'prik va sun'iy inshootlar bo'yicha ketma-ketlik va sifat nazorati bosqichi.",
+    tasksEyebrowFallback: "Vazifalar",
+    tasksTitleFallback: "Klaster bajaradigan asosiy ishlar",
+    operationalTasks: "Operatsion Vazifalar",
+    tasksCount: (n) => `${n} ta faoliyat yo'nalishi`,
+    institutionProcess: "Muassasa Jarayoni",
+    institutionProcessDesc: "Diagnostika, ishlab chiqarish, tiklash va texnik soz holatda saqlash ishlari bitta operatsion tizimda birlashadi.",
+
+    // Labels
+    pageLabel: "Sahifa",
+    aboutLabel: "Korxona haqida",
+    zavodLabel: "Zavod va Texnologiyalar",
+    announcementLabel: "Tanlov Savdolari",
+    contactLabel: "Qayta Aloqa",
+    infoLabel: "Ma'lumot",
+    branchesLabel: "Hududiy Tarmoq",
+
+    // Status page
+    noInfo: "Ma'lumot mavjud emas.",
+    downloadDoc: "Hujjatni yuklab olish",
+
+    // Leaders
+    bornLabel: "Tug'ilgan sanasi va joyi:",
+    educationLabel: "Tamomlagan:",
+    noData: "Ma'lumot kiritilmagan",
+
+    // Contact page
+    contactTitle: "Bog'lanish va Manzil",
+    phones: "Telefon raqamlar",
+    email: "E-pochtamiz",
+    workHours: "Ish vaqti",
+    bankDetails: "Hisob-raqam",
+    address: "Joylashuv manzili",
+    mapTitle: "O'zyo'lko'prik xaritada",
+
+    // Announcement
+    emailLabel: "Tijorat takliflarini yuborish uchun e-pochta:",
+
+    // Footer
+    footerContact: "Aloqa sahifasi",
+
+    // Price / Catalog
+    noProducts: "Hozircha hech qanday mahsulot yoki xizmat kiritilmagan.",
+    viewDetails: "Batafsil ko'rish",
+    downloadFile: "Faylni yuklab olish",
+    downloadBtn: "Yuklab olish",
+    fileAvailable: "Fayl bor",
+    moreInfo: "Batafsil ma'lumot",
+    catalogDocs: "Katalog hujjatlari",
+    catalogDefaultDesc: "O'zyo'lko'prik klasteri rasmiy zavod mahsulotlari, ko'prik va temir-beton konstruksiyalari katalogi.",
+    nomDefaultDesc: "O'zyo'lko'prik klasteri rasmiy zavod mahsulotlari va buyumlari nomenklaturasi.",
+
+    // Filiallar
+    filiallarTitle: "Filiallar",
+    branchesHeading: "Hududiy Filiallar va Bazalar",
+    searchBranch: "Filial, rahbariyat yoki hudud bo'yicha qidiruv...",
+    directorLabel: "Filial Rahbari (Direktor)",
+    detailsBtn: "Batafsil ma'lumotlarni ko'rish",
+    branchAddress: "Manzil:",
+    branchPhone: "Telefon raqami:",
+    branchTasks: "Asosiy faoliyati (Vazifalar)",
+    branchFile: "Ilova fayl:",
+    branchFileBtn: "Faylni yuklab olish",
+    branchOrder: "Tartib:",
+    branchActive: "Holat:",
+    activeYes: "Faol",
+    activeNo: "Nofaol",
+    branchDesc: "Filial haqida:",
   },
+
   ru: {
-    loading: "\u0417\u0430\u0433\u0440\u0443\u0437\u043a\u0430 \u0434\u0430\u043d\u043d\u044b\u0445 \u0441\u0430\u0439\u0442\u0430...",
-    backendCheck: "\u041f\u0440\u043e\u0432\u0435\u0440\u044c\u0442\u0435 \u0440\u0430\u0431\u043e\u0442\u0443 \u0431\u0430\u0441\u044f: http://127.0.0.1:8000",
-    pageNotFound: "\u0421\u0442\u0440\u0430\u043d\u0438\u0446\u0430 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u0430",
-    contact: "\u0421\u0432\u044f\u0437\u044c",
-    searchPlaceholder: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u044b \u0438\u043b\u0438 \u043a\u043b\u044e\u0447\u0435\u0432\u043e\u0435 \u0441\u043b\u043e\u0432\u043e...",
-    searchTitle: "\u041f\u043e\u0438\u0441\u043a \u043f\u043e \u0441\u0430\u0439\u0442\u0443",
-    searchPageLabel: "\u0421\u0442\u0440\u0430\u043d\u0438\u0446\u0430 \u0441\u0430\u0439\u0442\u0430",
-    legalSmall: "\u0433\u043e\u0441\u0443\u0434\u0430\u0440\u0441\u0442\u0432\u0435\u043d\u043d\u043e\u0435 \u0443\u0447\u0440\u0435\u0436\u0434\u0435\u043d\u0438\u0435 \u043a\u043b\u0430\u0441\u0442\u0435\u0440\u0430",
-    heroBtn1: "\u041f\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u043a\u0430\u0442\u0430\u043b\u043e\u0433",
-    heroBtn2: "\u0421\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f",
-    lang: "RU",
+    // System
+    loading: "Загрузка данных сайта...",
+    backendCheck: "Проверьте работу сервера: http://127.0.0.1:8000",
+    pageNotFound: "Страница не найдена",
+    legalSmall: "государственное учреждение кластера",
+
+    // Header
+    contact: "Связь",
+    searchTitle: "Поиск по сайту",
+    searchPlaceholder: "Введите название страницы или ключевое слово...",
+    searchPageLabel: "Страница сайта",
+
+    // Hero
+    heroKicker: "Республиканская Мостовая Инфраструктура",
+    heroBtn1: "Посмотреть каталог",
+    heroBtn2: "Связаться",
+    heroBadge: "Единая Кластерная Модель",
+    heroProcess: "Проектирование → Производство → Эксплуатация",
+    heroImgAlt: "Мост и производственный объект",
+
+    // Quick links
+    ql_catalog: "Каталог",
+    ql_catalog_detail: "Продукция и документы",
+    ql_leaders: "Руководство",
+    ql_leaders_detail: "Ответственные лица",
+    ql_elonlar: "Объявления",
+    ql_elonlar_detail: "Тендеры и закупки",
+    ql_contact: "Обратная связь",
+    ql_contact_detail: "Адрес и телефоны",
+
+    // Metrics
+    metricDir: "Основное Направление",
+    metricTask: "Задача Кластера",
+    metricContact: "Каналы Связи",
+    metricControl: "Полный Контроль",
+
+    // Home sections
+    modelFallback: "Модель Кластера",
+    modelTitleFallback: "Единое управление от проекта до готовой конструкции",
+    capEyebrowFallback: "Направления",
+    capTitleFallback: "Основные блоки услуг для мостовой инфраструктуры",
+    capDesc: "Направление высокоточных технических и инженерных услуг, реализуемых учреждением.",
+    workflowEyebrowFallback: "Рабочий Процесс",
+    workflowTitleFallback: "От технического решения к практическому результату",
+    workflowSteps: ["Диагностика", "Проектирование", "Производство", "Эксплуатация"],
+    workflowStepDesc: "Этап последовательного контроля качества по мостам и искусственным сооружениям.",
+    tasksEyebrowFallback: "Задачи",
+    tasksTitleFallback: "Основные работы, выполняемые кластером",
+    operationalTasks: "Операционные Задачи",
+    tasksCount: (n) => `${n} направлений деятельности`,
+    institutionProcess: "Процесс Учреждения",
+    institutionProcessDesc: "Диагностика, производство, восстановление и техническое обслуживание объединены в одной операционной системе.",
+
+    // Labels
+    pageLabel: "Страница",
+    aboutLabel: "О предприятии",
+    zavodLabel: "Завод и Технологии",
+    announcementLabel: "Тендерные Торги",
+    contactLabel: "Обратная Связь",
+    infoLabel: "Информация",
+    branchesLabel: "Региональная Сеть",
+
+    // Status page
+    noInfo: "Информация отсутствует.",
+    downloadDoc: "Скачать документ",
+
+    // Leaders
+    bornLabel: "Дата и место рождения:",
+    educationLabel: "Образование:",
+    noData: "Данные не введены",
+
+    // Contact page
+    contactTitle: "Связь и Адрес",
+    phones: "Телефоны",
+    email: "Электронная почта",
+    workHours: "Рабочее время",
+    bankDetails: "Банковские реквизиты",
+    address: "Адрес",
+    mapTitle: "O'zyo'lko'prik на карте",
+
+    // Announcement
+    emailLabel: "Электронная почта для коммерческих предложений:",
+
+    // Footer
+    footerContact: "Страница контактов",
+
+    // Price / Catalog
+    noProducts: "Продукты или услуги пока не добавлены.",
+    viewDetails: "Подробнее",
+    downloadFile: "Скачать файл",
+    downloadBtn: "Скачать",
+    fileAvailable: "Файл есть",
+    moreInfo: "Подробная информация",
+    catalogDocs: "Документы каталога",
+    catalogDefaultDesc: "Официальный каталог продукции завода кластера O'zyo'lko'prik: мостовые и железобетонные конструкции.",
+    nomDefaultDesc: "Официальная номенклатура продукции и изделий завода кластера O'zyo'lko'prik.",
+
+    // Filiallar
+    filiallarTitle: "Филиалы",
+    branchesHeading: "Региональные Филиалы и Базы",
+    searchBranch: "Поиск по филиалу, руководителю или региону...",
+    directorLabel: "Руководитель Филиала (Директор)",
+    detailsBtn: "Подробная информация",
+    branchAddress: "Адрес:",
+    branchPhone: "Телефон:",
+    branchTasks: "Основная деятельность (Задачи)",
+    branchFile: "Прикреплённый файл:",
+    branchFileBtn: "Скачать файл",
+    branchOrder: "Порядок:",
+    branchActive: "Статус:",
+    activeYes: "Активен",
+    activeNo: "Неактивен",
+    branchDesc: "О филиале:",
   },
+
   en: {
+    // System
     loading: "Loading site data...",
     backendCheck: "Check that backend is running: http://127.0.0.1:8000",
     pageNotFound: "Page not found",
-    contact: "Contact",
-    searchPlaceholder: "Enter page name or keyword...",
-    searchTitle: "Search the site",
-    searchPageLabel: "Site page",
     legalSmall: "state cluster institution",
+
+    // Header
+    contact: "Contact",
+    searchTitle: "Search the site",
+    searchPlaceholder: "Enter page name or keyword...",
+    searchPageLabel: "Site page",
+
+    // Hero
+    heroKicker: "Republic Bridge Infrastructure",
     heroBtn1: "View catalog",
     heroBtn2: "Get in touch",
-    lang: "EN",
+    heroBadge: "Single Cluster Model",
+    heroProcess: "Design → Production → Operation",
+    heroImgAlt: "Bridge and production facility",
+
+    // Quick links
+    ql_catalog: "Catalog",
+    ql_catalog_detail: "Products and documents",
+    ql_leaders: "Management",
+    ql_leaders_detail: "Institution officials",
+    ql_elonlar: "Announcements",
+    ql_elonlar_detail: "Tenders and purchases",
+    ql_contact: "Contact us",
+    ql_contact_detail: "Address and phones",
+
+    // Metrics
+    metricDir: "Core Directions",
+    metricTask: "Cluster Tasks",
+    metricContact: "Contact Channels",
+    metricControl: "Full Control",
+
+    // Home sections
+    modelFallback: "Cluster Model",
+    modelTitleFallback: "Single management from project to finished structure",
+    capEyebrowFallback: "Directions",
+    capTitleFallback: "Core service blocks for bridge infrastructure",
+    capDesc: "High-precision technical and engineering service direction implemented by the institution.",
+    workflowEyebrowFallback: "Workflow",
+    workflowTitleFallback: "From technical decision to practical result",
+    workflowSteps: ["Diagnostics", "Design", "Production", "Operation"],
+    workflowStepDesc: "Quality control and sequencing stage for bridges and artificial structures.",
+    tasksEyebrowFallback: "Tasks",
+    tasksTitleFallback: "Key activities performed by the cluster",
+    operationalTasks: "Operational Tasks",
+    tasksCount: (n) => `${n} activity directions`,
+    institutionProcess: "Institution Process",
+    institutionProcessDesc: "Diagnostics, production, restoration and maintenance are unified in one operational system.",
+
+    // Labels
+    pageLabel: "Page",
+    aboutLabel: "About the Company",
+    zavodLabel: "Plant and Technologies",
+    announcementLabel: "Tender Sales",
+    contactLabel: "Contact",
+    infoLabel: "Information",
+    branchesLabel: "Regional Network",
+
+    // Status page
+    noInfo: "No information available.",
+    downloadDoc: "Download document",
+
+    // Leaders
+    bornLabel: "Date and place of birth:",
+    educationLabel: "Education:",
+    noData: "No data entered",
+
+    // Contact page
+    contactTitle: "Contact and Address",
+    phones: "Phone numbers",
+    email: "Our email",
+    workHours: "Working hours",
+    bankDetails: "Bank details",
+    address: "Location address",
+    mapTitle: "O'zyo'lko'prik on the map",
+
+    // Announcement
+    emailLabel: "Email for commercial proposals:",
+
+    // Footer
+    footerContact: "Contact page",
+
+    // Price / Catalog
+    noProducts: "No products or services added yet.",
+    viewDetails: "View details",
+    downloadFile: "Download file",
+    downloadBtn: "Download",
+    fileAvailable: "File available",
+    moreInfo: "Detailed information",
+    catalogDocs: "Catalog documents",
+    catalogDefaultDesc: "Official catalog of O'zyo'lko'prik cluster plant products: bridge and reinforced concrete structures.",
+    nomDefaultDesc: "Official nomenclature of products and items of O'zyo'lko'prik cluster plant.",
+
+    // Filiallar
+    filiallarTitle: "Branches",
+    branchesHeading: "Regional Branches and Bases",
+    searchBranch: "Search by branch, director or region...",
+    directorLabel: "Branch Director",
+    detailsBtn: "View full information",
+    branchAddress: "Address:",
+    branchPhone: "Phone:",
+    branchTasks: "Main activities (Tasks)",
+    branchFile: "Attached file:",
+    branchFileBtn: "Download file",
+    branchOrder: "Order:",
+    branchActive: "Status:",
+    activeYes: "Active",
+    activeNo: "Inactive",
+    branchDesc: "About the branch:",
   },
 };
 
@@ -438,34 +746,34 @@ function SearchModal({ site, onClose, onNavigate }) {
   );
 }
 
-function PageRenderer({ page, site, onNavigate }) {
+function PageRenderer({ page, site, onNavigate, t }) {
   if (!page) {
     return (
       <section className="page-shell">
         <div className="glass-panel" style={{ padding: 48, textAlign: "center" }}>
           <Sparkles size={40} style={{ color: "#06b6d4", marginBottom: 16 }} />
-          <h2>Sahifa topilmadi</h2>
+          <h2>{t.pageNotFound}</h2>
         </div>
       </section>
     );
   }
 
-  if (page.type === "home") return <Home site={site} onNavigate={onNavigate} />;
-  if (page.type === "leaders") return <Leaders page={page} site={site} />;
-  if (page.type === "document") return <DocumentPage page={page} site={site} />;
-  if (page.type === "announcement") return <Announcement page={page} />;
-  if (page.type === "contact") return <Contact site={site} />;
-  if (page.slug === "narx-navo") return <PriceGridPage page={page} site={site} />;
-  if (page.type === "filiallar" || page.slug === "filiallar") return <FiliallarPage page={page} site={site} />;
-  return <StatusPage page={page} site={site} />;
+  if (page.type === "home") return <Home site={site} onNavigate={onNavigate} t={t} />;
+  if (page.type === "leaders") return <Leaders page={page} site={site} t={t} />;
+  if (page.type === "document") return <DocumentPage page={page} site={site} t={t} />;
+  if (page.type === "announcement") return <Announcement page={page} t={t} />;
+  if (page.type === "contact") return <Contact site={site} t={t} />;
+  if (page.slug === "narx-navo") return <PriceGridPage page={page} site={site} t={t} />;
+  if (page.type === "filiallar" || page.slug === "filiallar") return <FiliallarPage page={page} site={site} t={t} />;
+  return <StatusPage page={page} site={site} t={t} />;
 }
 
-function Home({ site, onNavigate }) {
+function Home({ site, onNavigate, t }) {
   const quickLinks = [
-    { label: "Katalog", slug: "katalog", detail: "Mahsulotlar va hujjatlar" },
-    { label: "Rahbariyat", slug: "rahbariyat", detail: "Muassasa masʼullari" },
-    { label: "Eʼlonlar", slug: "elonlar", detail: "Tanlovlar va xaridlar" },
-    { label: "Qayta aloqa", slug: "qayta-aloqa", detail: "Manzil va telefonlar" },
+    { label: t.ql_catalog, slug: "katalog", detail: t.ql_catalog_detail },
+    { label: t.ql_leaders, slug: "rahbariyat", detail: t.ql_leaders_detail },
+    { label: t.ql_elonlar, slug: "elonlar", detail: t.ql_elonlar_detail },
+    { label: t.ql_contact, slug: "qayta-aloqa", detail: t.ql_contact_detail },
   ];
 
   const heroSrc = site?.assets?.hero || DEFAULT_ASSETS.hero;
@@ -478,7 +786,7 @@ function Home({ site, onNavigate }) {
           <div>
             <div className="hero-kicker">
               <ShieldCheck size={16} />
-              Respublika Koʻprik Infratuzilmasi
+              {t.heroKicker}
             </div>
             <h1 className="hero-title">{site.brand.legalName}</h1>
             <div className="hero-tagline">{site.brand.tagline}</div>
@@ -486,11 +794,11 @@ function Home({ site, onNavigate }) {
 
             <div className="hero-actions">
               <button className="btn-primary" onClick={() => onNavigate("katalog")}>
-                <span>Katalogni koʻrish</span>
+                <span>{t.heroBtn1}</span>
                 <MoveRight size={18} />
               </button>
               <button className="btn-secondary" onClick={() => onNavigate("qayta-aloqa")}>
-                Bogʻlanish
+                {t.heroBtn2}
               </button>
             </div>
           </div>
@@ -502,14 +810,14 @@ function Home({ site, onNavigate }) {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = DEFAULT_ASSETS.hero;
               }}
-              alt="Koʻprik va ishlab chiqarish obyekti"
+              alt={t.heroImgAlt}
             />
             <div className="hero-card-overlay">
               <div className="hero-card-badge">
                 <Layers size={14} />
-                Yagona Klaster Modeli
+                {t.heroBadge}
               </div>
-              <h3>Loyihalash → Ishlab chiqarish → Ekspluatatsiya</h3>
+              <h3>{t.heroProcess}</h3>
             </div>
           </div>
         </div>
@@ -536,29 +844,29 @@ function Home({ site, onNavigate }) {
       <section className="metrics-band">
         <div className="metric-item">
           <div className="metric-number">{site.home.capabilities.length}</div>
-          <div className="metric-label">Asosiy Yoʻnalish</div>
+          <div className="metric-label">{t.metricDir}</div>
         </div>
         <div className="metric-item">
           <div className="metric-number">{site.home.tasks.length}</div>
-          <div className="metric-label">Klaster Vazifasi</div>
+          <div className="metric-label">{t.metricTask}</div>
         </div>
         <div className="metric-item">
           <div className="metric-number">{site.contact.phones.length}</div>
-          <div className="metric-label">Aloqa Kanallari</div>
+          <div className="metric-label">{t.metricContact}</div>
         </div>
         <div className="metric-item">
           <div className="metric-number">360°</div>
-          <div className="metric-label">Toʻliq Nazorat</div>
+          <div className="metric-label">{t.metricControl}</div>
         </div>
       </section>
 
       <section className="section">
         <div className="section-heading">
-          <span className="eyebrow">{site.home.modelEyebrow || "Klaster Modeli"}</span>
-          <h2>{site.home.modelTitle || "Loyihadan tayyor konstruksiyagacha yagona boshqaruv"}</h2>
+          <span className="eyebrow">{site.home.modelEyebrow || t.modelFallback}</span>
+          <h2>{site.home.modelTitle || t.modelTitleFallback}</h2>
         </div>
         <div className="glass-panel" style={{ padding: 36, display: "grid", gap: 20 }}>
-          <p style={{ fontSize: 17, lineHeight: 1.7, color: "#e2e8f0" }}>{site.home.purpose}</p>
+          <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--text-muted)" }}>{site.home.purpose}</p>
           <div
             style={{
               padding: 20,
@@ -572,9 +880,9 @@ function Home({ site, onNavigate }) {
           >
             <Sparkles size={24} style={{ color: "#06b6d4", flexShrink: 0 }} />
             <div>
-              <strong style={{ color: "var(--text-main)", display: "block" }}>Muassasa Jarayoni</strong>
+              <strong style={{ color: "var(--text-main)", display: "block" }}>{t.institutionProcess}</strong>
               <span style={{ fontSize: 14, color: "var(--text-muted)" }}>
-                Diagnostika, ishlab chiqarish, tiklash va texnik soz holatda saqlash ishlari bitta operatsion tizimda birlashadi.
+                {t.institutionProcessDesc}
               </span>
             </div>
           </div>
@@ -583,8 +891,8 @@ function Home({ site, onNavigate }) {
 
       <section className="section">
         <div className="section-heading">
-          <span className="eyebrow">{site.home.capabilitiesEyebrow || "Yoʻnalishlar"}</span>
-          <h2>{site.home.capabilitiesTitle || "Koʻprik infratuzilmasi uchun asosiy xizmat bloklari"}</h2>
+          <span className="eyebrow">{site.home.capabilitiesEyebrow || t.capEyebrowFallback}</span>
+          <h2>{site.home.capabilitiesTitle || t.capTitleFallback}</h2>
         </div>
         <div className="capability-grid">
           {site.home.capabilities.map((capability, index) => (
@@ -596,7 +904,7 @@ function Home({ site, onNavigate }) {
                 <span className="capability-num">{String(index + 1).padStart(2, "0")}</span>
               </div>
               <h3>{capability}</h3>
-              <p>Muassasa tomonidan amalga oshiriladigan yuqori aniqlikdagi texnik va muhandislik xizmatlari yoʻnalishi.</p>
+              <p>{t.capDesc}</p>
             </article>
           ))}
         </div>
@@ -604,15 +912,15 @@ function Home({ site, onNavigate }) {
 
       <section className="section">
         <div className="section-heading">
-          <span className="eyebrow">{site.home.workflowEyebrow || "Ish Oqimi"}</span>
-          <h2>{site.home.workflowTitle || "Texnik qarordan amaliy natijagacha"}</h2>
+          <span className="eyebrow">{site.home.workflowEyebrow || t.workflowEyebrowFallback}</span>
+          <h2>{site.home.workflowTitle || t.workflowTitleFallback}</h2>
         </div>
         <div className="process-grid">
-          {["Diagnostika", "Loyihalash", "Ishlab chiqarish", "Ekspluatatsiya"].map((step, index) => (
+          {t.workflowSteps.map((step, index) => (
             <article className="process-card" key={step}>
               <div className="process-step-num">{index + 1}</div>
               <h3>{step}</h3>
-              <p>Koʻprik va sunʼiy inshootlar boʻyicha ketma-ketlik va sifat nazorati bosqichi.</p>
+              <p>{t.workflowStepDesc}</p>
             </article>
           ))}
         </div>
@@ -627,18 +935,18 @@ function Home({ site, onNavigate }) {
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = DEFAULT_ASSETS.plant;
               }}
-              alt="Ishlab chiqarish hududi"
+              alt={t.operationalTasks}
             />
             <div className="task-visual-info">
-              <strong>Operatsion Vazifalar</strong>
-              <span>{site.home.tasks.length} ta faoliyat yoʻnalishi</span>
+              <strong>{t.operationalTasks}</strong>
+              <span>{t.tasksCount(site.home.tasks.length)}</span>
             </div>
           </div>
 
           <div>
             <div className="section-heading" style={{ marginBottom: 20 }}>
-              <span className="eyebrow">{site.home.tasksEyebrow || "Vazifalar"}</span>
-              <h2>{site.home.tasksTitle || "Klaster bajaradigan asosiy ishlar"}</h2>
+              <span className="eyebrow">{site.home.tasksEyebrow || t.tasksEyebrowFallback}</span>
+              <h2>{site.home.tasksTitle || t.tasksTitleFallback}</h2>
             </div>
             <div className="task-list">
               {site.home.tasks.map((task, index) => (
@@ -661,20 +969,20 @@ function IconForIndex({ index }) {
   return <Icon size={24} />;
 }
 
-function StatusPage({ page, site }) {
+function StatusPage({ page, site, t }) {
   const pageImgSrc = page.imageUrl || site?.assets?.hero || DEFAULT_ASSETS.hero;
 
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label="Sahifa" />
+      <PageHero title={page.title} label={t.pageLabel} />
       <div className="glass-panel" style={{ padding: 48, display: "grid", gap: 24 }}>
         
         {page.content ? (
-          <p style={{ fontSize: 18, lineHeight: 1.8, color: "#e2e8f0", textAlign: "left", whiteSpace: "pre-line" }}>
+          <p style={{ fontSize: 18, lineHeight: 1.8, color: "var(--text-muted)", textAlign: "left", whiteSpace: "pre-line" }}>
             {page.content}
           </p>
         ) : (
-          <h2 style={{ fontSize: 24, color: "#e2e8f0", textAlign: "center" }}>{page.status || "Maʼlumot mavjud emas."}</h2>
+          <h2 style={{ fontSize: 24, color: "var(--text-main)", textAlign: "center" }}>{page.status || t.noInfo}</h2>
         )}
 
         {page.fileUrl && (
@@ -687,7 +995,7 @@ function StatusPage({ page, site }) {
               style={{ padding: "12px 24px", fontSize: 15 }}
               download
             >
-              <span>Hujjatni yuklab olish</span>
+              <span>{t.downloadDoc}</span>
               <ExternalLink size={16} />
             </a>
           </div>
@@ -707,10 +1015,10 @@ function StatusPage({ page, site }) {
   );
 }
 
-function Leaders({ page, site }) {
+function Leaders({ page, site, t }) {
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label="Korxona haqida" />
+      <PageHero title={page.title} label={t.aboutLabel} />
       <div className="leaders-grid">
         {page.leaders.map((leader, idx) => {
           const leaderImg =
@@ -737,10 +1045,10 @@ function Leaders({ page, site }) {
                 <h2>{leader.name}</h2>
                 <p className="position">{leader.position}</p>
                 <dl>
-                  <dt>Tugʻilgan sanasi va joyi:</dt>
-                  <dd>{leader.born || "Maʼlumot kiritilmagan"}</dd>
-                  <dt>Tamomlagan:</dt>
-                  <dd>{leader.education || "Maʼlumot kiritilmagan"}</dd>
+                  <dt>{t.bornLabel}</dt>
+                  <dd>{leader.born || t.noData}</dd>
+                  <dt>{t.educationLabel}</dt>
+                  <dd>{leader.education || t.noData}</dd>
                 </dl>
               </div>
             </article>
@@ -751,11 +1059,11 @@ function Leaders({ page, site }) {
   );
 }
 
-function DocumentPage({ page, site }) {
+function DocumentPage({ page, site, t }) {
   const defaultDesc = page.slug === "katalog"
-    ? "Oʻzyoʻlkoʻprik klasteri rasmiy zavod mahsulotlari, koʻprik va temir-beton konstruksiyalari katalogi."
+    ? t.catalogDefaultDesc
     : page.slug === "nomenklatura"
-      ? "Oʻzyoʻlkoʻprik klasteri rasmiy zavod mahsulotlari va buyumlari nomenklaturasi."
+      ? t.nomDefaultDesc
       : "";
 
   const pageDesc = page.content || defaultDesc;
@@ -774,12 +1082,12 @@ function DocumentPage({ page, site }) {
 
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label="Zavod va Texnologiyalar" />
+      <PageHero title={page.title} label={t.zavodLabel} />
       <div style={{ display: "grid", gap: 32 }}>
         
         {pageDesc && (
           <div style={{ textAlign: "center", maxWidth: 900, margin: "0 auto 16px auto" }}>
-            <p style={{ fontSize: 18, lineHeight: 1.8, color: "#cbd5e1" }}>
+            <p style={{ fontSize: 18, lineHeight: 1.8, color: "var(--text-muted)" }}>
               {pageDesc}
             </p>
           </div>
@@ -831,7 +1139,7 @@ function DocumentPage({ page, site }) {
                   style={{ padding: "16px 36px", fontSize: 16 }}
                   download
                 >
-                  <span>Hujjatni yuklab olish</span>
+                  <span>{t.downloadDoc}</span>
                   <ExternalLink size={18} />
                 </a>
               </div>
@@ -843,25 +1151,25 @@ function DocumentPage({ page, site }) {
   );
 }
 
-function Announcement({ page }) {
+function Announcement({ page, t }) {
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label="Tanlov Savdolari" />
+      <PageHero title={page.title} label={t.announcementLabel} />
       <div className="announcement-box">
-        <p style={{ fontSize: 16, color: "#e2e8f0", marginBottom: 24 }}>{page.intro}</p>
+        <p style={{ fontSize: 16, color: "var(--text-muted)", marginBottom: 24 }}>{page.intro}</p>
         <div className="equipment-grid">
           {page.items.map((item) => (
             <div className="equipment-badge" key={item}>
-              <Wrench size={18} style={{ color: "#06b6d4" }} />
+              <Wrench size={18} style={{ color: "var(--accent-cyan)" }} />
               <span>{item}</span>
             </div>
           ))}
         </div>
         <div className="proposal-card">
-          <Mail size={24} style={{ color: "#06b6d4" }} />
+          <Mail size={24} style={{ color: "var(--accent-cyan)" }} />
           <div>
             <span style={{ color: "var(--text-muted)", display: "block", fontSize: 13 }}>
-              Tijorat takliflarini yuborish uchun e-pochta:
+              {t.emailLabel}
             </span>
             <a href={`mailto:${page.email}`}>{page.email}</a>
           </div>
@@ -930,30 +1238,26 @@ function PageHero({ title, label }) {
   );
 }
 
-function Footer({ site, onNavigate }) {
+function Footer({ site, onNavigate, t }) {
   return (
     <footer className="footer">
       <div className="footer-brand">
         <strong>{site.brand.legalName}</strong>
         <p>{site.brand.tagline}</p>
         <div className="footer-links">
-          <a href={API_DOCS.swagger} target="_blank" rel="noreferrer">
-            API (Swagger)
-          </a>
-          <a href={API_DOCS.redoc} target="_blank" rel="noreferrer">
-            API (ReDoc)
-          </a>
+          <a href={API_DOCS.swagger} target="_blank" rel="noreferrer">API (Swagger)</a>
+          <a href={API_DOCS.redoc} target="_blank" rel="noreferrer">API (ReDoc)</a>
         </div>
       </div>
       <button className="btn-primary" onClick={() => onNavigate("qayta-aloqa")}>
         <Mail size={16} />
-        <span>Aloqa sahifasi</span>
+        <span>{t.footerContact}</span>
       </button>
     </footer>
   );
 }
 
-function PriceGridPage({ page, site }) {
+function PriceGridPage({ page, site, t }) {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedCatalog, setSelectedCatalog] = useState(null);
 
@@ -962,11 +1266,11 @@ function PriceGridPage({ page, site }) {
 
   return (
     <section className="page-shell">
-      <PageHero title={page.title} label="Maʼlumot" />
+      <PageHero title={page.title} label={t.infoLabel} />
 
       {page.content && (
         <div style={{ textAlign: "center", maxWidth: 900, margin: "0 auto 32px auto" }}>
-          <p style={{ fontSize: 18, lineHeight: 1.8, color: "#cbd5e1", whiteSpace: "pre-line" }}>
+          <p style={{ fontSize: 18, lineHeight: 1.8, color: "var(--text-muted)", whiteSpace: "pre-line" }}>
             {page.content}
           </p>
         </div>
@@ -974,25 +1278,19 @@ function PriceGridPage({ page, site }) {
 
       {products.length === 0 && catalogItems.length === 0 ? (
         <div className="glass-panel" style={{ padding: 48, textAlign: "center" }}>
-          <p style={{ color: "var(--text-muted)", fontSize: 16 }}>Hozircha hech qanday mahsulot yoki xizmat kiritilmagan.</p>
+          <p style={{ color: "var(--text-muted)", fontSize: 16 }}>{t.noProducts}</p>
         </div>
       ) : null}
 
-      {/* ── Mahsulotlar bo'limi ── */}
       {products.length > 0 && (
         <div style={{ marginBottom: 48 }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24, marginTop: 16 }}>
             {products.map((product) => (
-              <div
-                key={product.id}
-                className="glass-panel price-item-card"
+              <div key={product.id} className="glass-panel price-item-card"
                 onClick={() => setSelectedProduct(product)}
-                style={{
-                  padding: 0, cursor: "pointer", display: "flex", flexDirection: "column",
+                style={{ padding: 0, cursor: "pointer", display: "flex", flexDirection: "column",
                   transition: "transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
-                  border: "1px solid var(--border-dim)", borderRadius: "var(--radius-md)",
-                  overflow: "hidden", height: "100%",
-                }}
+                  border: "1px solid var(--border-dim)", borderRadius: "var(--radius-md)", overflow: "hidden", height: "100%" }}
                 onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.borderColor = "var(--border-bright)"; e.currentTarget.style.boxShadow = "var(--shadow-glow)"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "var(--border-dim)"; e.currentTarget.style.boxShadow = "none"; }}
               >
@@ -1014,7 +1312,7 @@ function PriceGridPage({ page, site }) {
                   )}
                   <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent-cyan)", fontSize: 13, fontWeight: 600, marginTop: "auto", paddingTop: 8 }}>
                     {product.fileUrl && <FileText size={14} />}
-                    <span>Batafsil koʻrish</span>
+                    <span>{t.viewDetails}</span>
                     <ArrowRight size={14} />
                   </div>
                 </div>
@@ -1024,10 +1322,9 @@ function PriceGridPage({ page, site }) {
         </div>
       )}
 
-      {/* ── Katalog hujjatlari ── */}
       {catalogItems.length > 0 && (
         <div style={{ marginTop: products.length > 0 ? 16 : 0 }}>
-          {products.length > 0 && <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-main)", marginBottom: 20 }}>Katalog hujjatlari</h2>}
+          {products.length > 0 && <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-main)", marginBottom: 20 }}>{t.catalogDocs}</h2>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
             {catalogItems.map((item) => (
               <div key={item.id} className="glass-panel price-item-card" onClick={() => setSelectedCatalog(item)}
@@ -1037,14 +1334,14 @@ function PriceGridPage({ page, site }) {
               >
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <FileText size={32} style={{ color: "var(--accent-cyan)" }} />
-                  {item.fileUrl && <span style={{ fontSize: 12, padding: "4px 8px", borderRadius: 12, background: "rgba(6,182,212,0.15)", color: "var(--accent-cyan)", fontWeight: 600 }}>Fayl bor</span>}
+                  {item.fileUrl && <span style={{ fontSize: 12, padding: "4px 8px", borderRadius: 12, background: "rgba(6,182,212,0.15)", color: "var(--accent-cyan)", fontWeight: 600 }}>{t.fileAvailable}</span>}
                 </div>
                 <div style={{ flex: 1 }}>
                   <h3 style={{ fontSize: 18, marginBottom: 8, color: "var(--text-main)", fontWeight: 600 }}>{item.title}</h3>
                   {item.description && <p style={{ fontSize: 14, color: "var(--text-muted)", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.5 }}>{item.description}</p>}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent-cyan)", fontSize: 14, fontWeight: 600, marginTop: "auto" }}>
-                  <span>Batafsil koʻrish</span><ArrowRight size={16} />
+                  <span>{t.viewDetails}</span><ArrowRight size={16} />
                 </div>
               </div>
             ))}
@@ -1052,57 +1349,31 @@ function PriceGridPage({ page, site }) {
         </div>
       )}
 
-      {/* ── Mahsulot modal ── */}
       {selectedProduct && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.85)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 24 }} onClick={() => setSelectedProduct(null)}>
           <div className="glass-panel" style={{ maxWidth: 640, width: "100%", position: "relative", animation: "fadeIn 0.2s ease-out", overflow: "hidden", borderRadius: "var(--radius-md)", maxHeight: "90vh", display: "flex", flexDirection: "column" }} onClick={(e) => e.stopPropagation()}>
-            {/* Yopish tugmasi */}
             <button onClick={() => setSelectedProduct(null)} style={{ position: "absolute", top: 14, right: 14, color: "var(--text-muted)", cursor: "pointer", zIndex: 10, background: "rgba(0,0,0,0.5)", borderRadius: "50%", padding: 6, display: "flex", border: "none" }}
-              onMouseEnter={(e) => e.currentTarget.style.color = "#ffffff"} onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted)"}>
+              onMouseEnter={(e) => e.currentTarget.style.color = "var(--text-main)"} onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted)"}>
               <X size={18} />
             </button>
-
-            {/* Scroll area */}
             <div style={{ overflowY: "auto", flex: 1 }}>
-              {/* Rasm — to'liq ko'rinadi */}
               {selectedProduct.imageUrl && (
                 <div style={{ width: "100%", background: "var(--bg-surface-elevated)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <img
-                    src={selectedProduct.imageUrl}
-                    alt={selectedProduct.name}
-                    style={{ width: "100%", maxHeight: 380, objectFit: "contain", display: "block" }}
-                  />
+                  <img src={selectedProduct.imageUrl} alt={selectedProduct.name} style={{ width: "100%", maxHeight: 380, objectFit: "contain", display: "block" }} />
                 </div>
               )}
-
               <div style={{ padding: 28, display: "flex", flexDirection: "column", gap: 18 }}>
-                {/* Nom */}
-                <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-main)", margin: 0, paddingRight: 32 }}>
-                  {selectedProduct.name}
-                </h2>
-
-                {/* Matn */}
+                <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-main)", margin: 0, paddingRight: 32 }}>{selectedProduct.name}</h2>
                 {selectedProduct.text && (
                   <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 16 }}>
-                    <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>
-                      {selectedProduct.text}
-                    </p>
+                    <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>{selectedProduct.text}</p>
                   </div>
                 )}
-
-                {/* Fayl yuklab olish */}
                 {selectedProduct.fileUrl && (
                   <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 16, display: "flex", justifyContent: "center" }}>
-                    <a
-                      href={selectedProduct.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="btn-primary"
-                      style={{ padding: "12px 32px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }}
-                      download
-                    >
-                      <span>Faylni yuklab olish</span>
-                      <ExternalLink size={16} />
+                    <a href={selectedProduct.fileUrl} target="_blank" rel="noreferrer" className="btn-primary"
+                      style={{ padding: "12px 32px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }} download>
+                      <span>{t.downloadFile}</span><ExternalLink size={16} />
                     </a>
                   </div>
                 )}
@@ -1112,13 +1383,12 @@ function PriceGridPage({ page, site }) {
         </div>
       )}
 
-      {/* ── Katalog modal ── */}
       {selectedCatalog && (
         <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.75)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 24 }} onClick={() => setSelectedCatalog(null)}>
           <div className="glass-panel" style={{ maxWidth: 600, width: "100%", padding: 32, position: "relative", display: "grid", gap: 24, animation: "fadeIn 0.2s ease-out" }} onClick={(e) => e.stopPropagation()}>
-            <button onClick={() => setSelectedCatalog(null)} style={{ position: "absolute", top: 20, right: 20, color: "var(--text-muted)", cursor: "pointer" }} onMouseEnter={(e) => e.currentTarget.style.color = "#ffffff"} onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted)"}><X size={24} /></button>
+            <button onClick={() => setSelectedCatalog(null)} style={{ position: "absolute", top: 20, right: 20, color: "var(--text-muted)", cursor: "pointer" }}><X size={24} /></button>
             <div>
-              <span style={{ fontSize: 13, textTransform: "uppercase", color: "var(--accent-cyan)", fontWeight: 700, display: "block", marginBottom: 8 }}>Batafsil maʼlumot</span>
+              <span style={{ fontSize: 13, textTransform: "uppercase", color: "var(--accent-cyan)", fontWeight: 700, display: "block", marginBottom: 8 }}>{t.moreInfo}</span>
               <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--text-main)", lineHeight: 1.3 }}>{selectedCatalog.title}</h2>
             </div>
             {selectedCatalog.description && (
@@ -1138,8 +1408,9 @@ function PriceGridPage({ page, site }) {
                   </div>
                 ) : null}
                 <div style={{ display: "flex", justifyContent: "center", width: "100%", marginTop: 8 }}>
-                  <a href={selectedCatalog.fileUrl} target="_blank" rel="noreferrer" className="btn-primary" style={{ padding: "12px 28px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }} download>
-                    <span>Faylni yuklab olish</span><ExternalLink size={16} />
+                  <a href={selectedCatalog.fileUrl} target="_blank" rel="noreferrer" className="btn-primary"
+                    style={{ padding: "12px 28px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }} download>
+                    <span>{t.downloadFile}</span><ExternalLink size={16} />
                   </a>
                 </div>
               </div>
@@ -1152,8 +1423,7 @@ function PriceGridPage({ page, site }) {
 }
 
 
-
-function FiliallarPage({ page, site }) {
+function FiliallarPage({ page, site, t }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBranch, setSelectedBranch] = useState(null);
 
@@ -1243,7 +1513,7 @@ function FiliallarPage({ page, site }) {
 
   return (
     <section className="page-shell">
-      <PageHero title={page?.title || "Filiallar"} label="Hududiy Tarmoq" />
+      <PageHero title={page?.title || t.filiallarTitle} label={t.branchesLabel} />
 
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gap: 32 }}>
         {/* Banner va Tavsif */}
@@ -1252,7 +1522,7 @@ function FiliallarPage({ page, site }) {
             <Building2 size={32} style={{ color: "var(--accent-cyan)" }} />
             <div>
               <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--text-main)", margin: 0 }}>
-                Hududiy Filiallar va Bazalar
+                {t.branchesHeading}
               </h2>
               <p style={{ fontSize: 15, color: "var(--text-muted)", margin: "4px 0 0 0" }}>
                 {pageDesc}
@@ -1274,7 +1544,7 @@ function FiliallarPage({ page, site }) {
             />
             <input
               type="text"
-              placeholder="Filial, rahbariyat yoki hudud boʻyicha qidiruv..."
+              placeholder={t.searchBranch}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -1403,10 +1673,10 @@ function FiliallarPage({ page, site }) {
                 )}
                 <div>
                   <span style={{ fontSize: 11, color: "var(--accent-cyan)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 2 }}>
-                    Filial Rahbari (Direktor)
+                    {t.directorLabel}
                   </span>
                   <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text-main)" }}>
-                    {branch.director || "Maʼlumot kiritilmagan"}
+                    {branch.director || t.noData}
                   </span>
                 </div>
               </div>
@@ -1437,9 +1707,8 @@ function FiliallarPage({ page, site }) {
                 )}
               </div>
 
-              {/* Card pastidagi tugma */}
               <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent-cyan)", fontSize: 14, fontWeight: 600, marginTop: "auto", paddingTop: 8 }}>
-                <span>Batafsil maʼlumotlarni koʻrish</span>
+                <span>{t.detailsBtn}</span>
                 <ArrowRight size={16} />
               </div>
             </div>
@@ -1580,10 +1849,10 @@ function FiliallarPage({ page, site }) {
                   )}
                   <div>
                     <span style={{ fontSize: 12, color: "var(--accent-cyan)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 4, letterSpacing: 0.5 }}>
-                      Filial Rahbari (Direktor)
+                      {t.directorLabel}
                     </span>
                     <h3 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-main)", margin: 0, lineHeight: 1.3 }}>
-                      {selectedBranch.director || "Maʼlumot kiritilmagan"}
+                      {selectedBranch.director || t.noData}
                     </h3>
                   </div>
                 </div>
@@ -1594,7 +1863,7 @@ function FiliallarPage({ page, site }) {
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                       <Building2 size={22} style={{ color: "var(--accent-cyan)", marginTop: 2, flexShrink: 0 }} />
                       <div>
-                        <strong style={{ color: "var(--text-main)", display: "block", fontSize: 14, marginBottom: 2 }}>Manzil:</strong>
+                        <strong style={{ color: "var(--text-main)", display: "block", fontSize: 14, marginBottom: 2 }}>{t.branchAddress}</strong>
                         <span style={{ color: "var(--text-muted)", fontSize: 15 }}>{selectedBranch.address}</span>
                       </div>
                     </div>
@@ -1604,7 +1873,7 @@ function FiliallarPage({ page, site }) {
                     <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                       <Phone size={22} style={{ color: "var(--accent-cyan)", flexShrink: 0 }} />
                       <div>
-                        <strong style={{ color: "var(--text-main)", display: "block", fontSize: 14, marginBottom: 2 }}>Telefon raqami:</strong>
+                        <strong style={{ color: "var(--text-main)", display: "block", fontSize: 14, marginBottom: 2 }}>{t.branchPhone}</strong>
                         <a href={`tel:${selectedBranch.phone.replace(/\s+/g, '')}`} style={{ color: "var(--accent-cyan)", textDecoration: "none", fontWeight: 700, fontSize: 16 }}>
                           {selectedBranch.phone}
                         </a>
@@ -1617,7 +1886,7 @@ function FiliallarPage({ page, site }) {
                 {selectedBranch.description && (
                   <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 20 }}>
                     <h4 style={{ fontSize: 17, fontWeight: 700, color: "var(--text-main)", marginBottom: 10 }}>
-                      Filial Haqida Maʼlumot
+                      {t.branchDesc}
                     </h4>
                     <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>
                       {selectedBranch.description}
@@ -1629,7 +1898,7 @@ function FiliallarPage({ page, site }) {
                 {selectedBranch.tasks && (
                   <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 20 }}>
                     <h4 style={{ fontSize: 17, fontWeight: 700, color: "var(--text-main)", marginBottom: 10 }}>
-                      Asosiy Faoliyati va Vazifalari
+                      {t.branchTasks}
                     </h4>
                     <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>
                       {selectedBranch.tasks}
@@ -1648,7 +1917,7 @@ function FiliallarPage({ page, site }) {
                       style={{ padding: "12px 32px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }}
                       download
                     >
-                      <span>Hujjatni yuklab olish</span>
+                      <span>{t.downloadDoc}</span>
                       <ExternalLink size={16} />
                     </a>
                   </div>
