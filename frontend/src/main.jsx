@@ -158,10 +158,10 @@ function App() {
         {loadError ? (
           <div style={{ maxWidth: 480 }}>
             <p style={{ color: "#ef4444", fontWeight: 700, marginBottom: 8 }}>{loadError}</p>
-            <p style={{ fontSize: 13, color: "#94a3b8" }}>{t.backendCheck}</p>
+            <p style={{ fontSize: 13, color: "var(--text-muted)" }}>{t.backendCheck}</p>
           </div>
         ) : (
-          <p style={{ color: "#94a3b8" }}>{t.loading}</p>
+          <p style={{ color: "var(--text-muted)" }}>{t.loading}</p>
         )}
       </main>
     );
@@ -572,8 +572,8 @@ function Home({ site, onNavigate }) {
           >
             <Sparkles size={24} style={{ color: "#06b6d4", flexShrink: 0 }} />
             <div>
-              <strong style={{ color: "#fff", display: "block" }}>Muassasa Jarayoni</strong>
-              <span style={{ fontSize: 14, color: "#94a3b8" }}>
+              <strong style={{ color: "var(--text-main)", display: "block" }}>Muassasa Jarayoni</strong>
+              <span style={{ fontSize: 14, color: "var(--text-muted)" }}>
                 Diagnostika, ishlab chiqarish, tiklash va texnik soz holatda saqlash ishlari bitta operatsion tizimda birlashadi.
               </span>
             </div>
@@ -860,7 +860,7 @@ function Announcement({ page }) {
         <div className="proposal-card">
           <Mail size={24} style={{ color: "#06b6d4" }} />
           <div>
-            <span style={{ color: "#94a3b8", display: "block", fontSize: 13 }}>
+            <span style={{ color: "var(--text-muted)", display: "block", fontSize: 13 }}>
               Tijorat takliflarini yuborish uchun e-pochta:
             </span>
             <a href={`mailto:${page.email}`}>{page.email}</a>
@@ -960,7 +960,7 @@ function PriceGridPage({ page, site }) {
 
       {products.length === 0 && catalogItems.length === 0 ? (
         <div className="glass-panel" style={{ padding: 48, textAlign: "center" }}>
-          <p style={{ color: "#94a3b8", fontSize: 16 }}>Hozircha hech qanday mahsulot yoki xizmat kiritilmagan.</p>
+          <p style={{ color: "var(--text-muted)", fontSize: 16 }}>Hozircha hech qanday mahsulot yoki xizmat kiritilmagan.</p>
         </div>
       ) : null}
 
@@ -983,7 +983,7 @@ function PriceGridPage({ page, site }) {
                 onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.borderColor = "var(--border-dim)"; e.currentTarget.style.boxShadow = "none"; }}
               >
                 {product.imageUrl ? (
-                  <div style={{ width: "100%", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, minHeight: 200, maxHeight: 260, overflow: "hidden" }}>
+                  <div style={{ width: "100%", background: "var(--bg-surface-elevated)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, minHeight: 200, maxHeight: 260, overflow: "hidden" }}>
                     <img src={product.imageUrl} alt={product.name} style={{ width: "100%", maxHeight: 260, objectFit: "contain", display: "block" }} />
                   </div>
                 ) : (
@@ -992,7 +992,7 @@ function PriceGridPage({ page, site }) {
                   </div>
                 )}
                 <div style={{ padding: 20, display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
-                  <h3 style={{ fontSize: 17, fontWeight: 700, color: "#ffffff", lineHeight: 1.3, margin: 0 }}>{product.name}</h3>
+                  <h3 style={{ fontSize: 17, fontWeight: 700, color: "var(--text-main)", lineHeight: 1.3, margin: 0 }}>{product.name}</h3>
                   {product.text && (
                     <p style={{ fontSize: 14, color: "var(--text-muted)", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.6, margin: 0 }}>
                       {product.text}
@@ -1013,7 +1013,7 @@ function PriceGridPage({ page, site }) {
       {/* ── Katalog hujjatlari ── */}
       {catalogItems.length > 0 && (
         <div style={{ marginTop: products.length > 0 ? 16 : 0 }}>
-          {products.length > 0 && <h2 style={{ fontSize: 20, fontWeight: 700, color: "#ffffff", marginBottom: 20 }}>Katalog hujjatlari</h2>}
+          {products.length > 0 && <h2 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-main)", marginBottom: 20 }}>Katalog hujjatlari</h2>}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 24 }}>
             {catalogItems.map((item) => (
               <div key={item.id} className="glass-panel price-item-card" onClick={() => setSelectedCatalog(item)}
@@ -1026,7 +1026,7 @@ function PriceGridPage({ page, site }) {
                   {item.fileUrl && <span style={{ fontSize: 12, padding: "4px 8px", borderRadius: 12, background: "rgba(6,182,212,0.15)", color: "var(--accent-cyan)", fontWeight: 600 }}>Fayl bor</span>}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <h3 style={{ fontSize: 18, marginBottom: 8, color: "#ffffff", fontWeight: 600 }}>{item.title}</h3>
+                  <h3 style={{ fontSize: 18, marginBottom: 8, color: "var(--text-main)", fontWeight: 600 }}>{item.title}</h3>
                   {item.description && <p style={{ fontSize: 14, color: "var(--text-muted)", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden", lineHeight: 1.5 }}>{item.description}</p>}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--accent-cyan)", fontSize: 14, fontWeight: 600, marginTop: "auto" }}>
@@ -1052,7 +1052,7 @@ function PriceGridPage({ page, site }) {
             <div style={{ overflowY: "auto", flex: 1 }}>
               {/* Rasm — to'liq ko'rinadi */}
               {selectedProduct.imageUrl && (
-                <div style={{ width: "100%", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: "100%", background: "var(--bg-surface-elevated)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <img
                     src={selectedProduct.imageUrl}
                     alt={selectedProduct.name}
@@ -1063,7 +1063,7 @@ function PriceGridPage({ page, site }) {
 
               <div style={{ padding: 28, display: "flex", flexDirection: "column", gap: 18 }}>
                 {/* Nom */}
-                <h2 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: 0, paddingRight: 32 }}>
+                <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-main)", margin: 0, paddingRight: 32 }}>
                   {selectedProduct.name}
                 </h2>
 
@@ -1105,7 +1105,7 @@ function PriceGridPage({ page, site }) {
             <button onClick={() => setSelectedCatalog(null)} style={{ position: "absolute", top: 20, right: 20, color: "var(--text-muted)", cursor: "pointer" }} onMouseEnter={(e) => e.currentTarget.style.color = "#ffffff"} onMouseLeave={(e) => e.currentTarget.style.color = "var(--text-muted)"}><X size={24} /></button>
             <div>
               <span style={{ fontSize: 13, textTransform: "uppercase", color: "var(--accent-cyan)", fontWeight: 700, display: "block", marginBottom: 8 }}>Batafsil maʼlumot</span>
-              <h2 style={{ fontSize: 24, fontWeight: 700, color: "#ffffff", lineHeight: 1.3 }}>{selectedCatalog.title}</h2>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--text-main)", lineHeight: 1.3 }}>{selectedCatalog.title}</h2>
             </div>
             {selectedCatalog.description && (
               <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 16 }}>
@@ -1237,7 +1237,7 @@ function FiliallarPage({ page, site }) {
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
             <Building2 size={32} style={{ color: "var(--accent-cyan)" }} />
             <div>
-              <h2 style={{ fontSize: 24, fontWeight: 700, color: "#ffffff", margin: 0 }}>
+              <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--text-main)", margin: 0 }}>
                 Hududiy Filiallar va Bazalar
               </h2>
               <p style={{ fontSize: 15, color: "var(--text-muted)", margin: "4px 0 0 0" }}>
@@ -1268,8 +1268,8 @@ function FiliallarPage({ page, site }) {
                 padding: "12px 16px 12px 44px",
                 borderRadius: 24,
                 border: "1px solid var(--border-bright)",
-                background: "rgba(15, 23, 42, 0.6)",
-                color: "#ffffff",
+                background: "var(--search-input-bg)",
+                color: "var(--text-main)",
                 fontSize: 15,
                 outline: "none",
               }}
@@ -1324,7 +1324,7 @@ function FiliallarPage({ page, site }) {
 
               {/* Sarlavha & Holat */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: "#ffffff", margin: 0, lineHeight: 1.4 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 700, color: "var(--text-main)", margin: 0, lineHeight: 1.4 }}>
                   {branch.name}
                 </h3>
                 {branch.status && (
@@ -1391,7 +1391,7 @@ function FiliallarPage({ page, site }) {
                   <span style={{ fontSize: 11, color: "var(--accent-cyan)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 2 }}>
                     Filial Rahbari (Direktor)
                   </span>
-                  <span style={{ fontSize: 15, fontWeight: 700, color: "#ffffff" }}>
+                  <span style={{ fontSize: 15, fontWeight: 700, color: "var(--text-main)" }}>
                     {branch.director || "Maʼlumot kiritilmagan"}
                   </span>
                 </div>
@@ -1474,14 +1474,14 @@ function FiliallarPage({ page, site }) {
                 position: "absolute",
                 top: 16,
                 right: 16,
-                color: "#ffffff",
+                color: "var(--text-main)",
                 cursor: "pointer",
                 zIndex: 10,
-                background: "rgba(0,0,0,0.6)",
+                background: "var(--bg-surface)",
                 borderRadius: "50%",
                 padding: 10,
                 display: "flex",
-                border: "1px solid rgba(255,255,255,0.2)",
+                border: "1px solid var(--border-dim)",
               }}
               onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(6,182,212,0.8)")}
               onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0.6)")}
@@ -1492,7 +1492,7 @@ function FiliallarPage({ page, site }) {
             <div style={{ overflowY: "auto", flex: 1 }}>
               {/* Filial Rasmi */}
               {selectedBranch.imageUrl && (
-                <div style={{ width: "100%", background: "#0f172a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div style={{ width: "100%", background: "var(--bg-surface-elevated)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <img
                     src={selectedBranch.imageUrl}
                     alt={selectedBranch.name}
@@ -1514,7 +1514,7 @@ function FiliallarPage({ page, site }) {
                       </span>
                     )}
                   </div>
-                  <h2 style={{ fontSize: 26, fontWeight: 700, color: "#ffffff", margin: 0, lineHeight: 1.3 }}>
+                  <h2 style={{ fontSize: 26, fontWeight: 700, color: "var(--text-main)", margin: 0, lineHeight: 1.3 }}>
                     {selectedBranch.name}
                   </h2>
                 </div>
@@ -1527,7 +1527,7 @@ function FiliallarPage({ page, site }) {
                     gap: 20,
                     padding: 24,
                     borderRadius: 16,
-                    background: "linear-gradient(135deg, rgba(6, 182, 212, 0.12), rgba(15, 23, 42, 0.8))",
+                    background: "var(--bg-card)",
                     border: "1px solid rgba(6, 182, 212, 0.3)",
                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.2)",
                   }}
@@ -1568,7 +1568,7 @@ function FiliallarPage({ page, site }) {
                     <span style={{ fontSize: 12, color: "var(--accent-cyan)", fontWeight: 700, textTransform: "uppercase", display: "block", marginBottom: 4, letterSpacing: 0.5 }}>
                       Filial Rahbari (Direktor)
                     </span>
-                    <h3 style={{ fontSize: 22, fontWeight: 700, color: "#ffffff", margin: 0, lineHeight: 1.3 }}>
+                    <h3 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-main)", margin: 0, lineHeight: 1.3 }}>
                       {selectedBranch.director || "Maʼlumot kiritilmagan"}
                     </h3>
                   </div>
@@ -1580,7 +1580,7 @@ function FiliallarPage({ page, site }) {
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
                       <Building2 size={22} style={{ color: "var(--accent-cyan)", marginTop: 2, flexShrink: 0 }} />
                       <div>
-                        <strong style={{ color: "#ffffff", display: "block", fontSize: 14, marginBottom: 2 }}>Manzil:</strong>
+                        <strong style={{ color: "var(--text-main)", display: "block", fontSize: 14, marginBottom: 2 }}>Manzil:</strong>
                         <span style={{ color: "var(--text-muted)", fontSize: 15 }}>{selectedBranch.address}</span>
                       </div>
                     </div>
@@ -1590,7 +1590,7 @@ function FiliallarPage({ page, site }) {
                     <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                       <Phone size={22} style={{ color: "var(--accent-cyan)", flexShrink: 0 }} />
                       <div>
-                        <strong style={{ color: "#ffffff", display: "block", fontSize: 14, marginBottom: 2 }}>Telefon raqami:</strong>
+                        <strong style={{ color: "var(--text-main)", display: "block", fontSize: 14, marginBottom: 2 }}>Telefon raqami:</strong>
                         <a href={`tel:${selectedBranch.phone.replace(/\s+/g, '')}`} style={{ color: "var(--accent-cyan)", textDecoration: "none", fontWeight: 700, fontSize: 16 }}>
                           {selectedBranch.phone}
                         </a>
@@ -1602,7 +1602,7 @@ function FiliallarPage({ page, site }) {
                 {/* Filial haqida ma'lumot (Tavsif) */}
                 {selectedBranch.description && (
                   <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 20 }}>
-                    <h4 style={{ fontSize: 17, fontWeight: 700, color: "#ffffff", marginBottom: 10 }}>
+                    <h4 style={{ fontSize: 17, fontWeight: 700, color: "var(--text-main)", marginBottom: 10 }}>
                       Filial Haqida Maʼlumot
                     </h4>
                     <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>
@@ -1614,7 +1614,7 @@ function FiliallarPage({ page, site }) {
                 {/* Asosiy faoliyati (Vazifalar) */}
                 {selectedBranch.tasks && (
                   <div style={{ borderTop: "1px solid var(--border-dim)", paddingTop: 20 }}>
-                    <h4 style={{ fontSize: 17, fontWeight: 700, color: "#ffffff", marginBottom: 10 }}>
+                    <h4 style={{ fontSize: 17, fontWeight: 700, color: "var(--text-main)", marginBottom: 10 }}>
                       Asosiy Faoliyati va Vazifalari
                     </h4>
                     <p style={{ fontSize: 15, lineHeight: 1.8, color: "var(--text-main)", whiteSpace: "pre-line", margin: 0 }}>

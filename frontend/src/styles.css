@@ -1489,3 +1489,164 @@ body, html, .site-header, .top-strip, .footer,
               border-color 0.3s ease, color 0.3s ease,
               box-shadow 0.3s ease;
 }
+
+/* =====================================================
+   LIGHT THEME: INLINE STYLE OVERRIDES VIA CSS
+   (inline style elementlari CSS orqali override)
+   ===================================================== */
+
+/* Barcha matn elementlari light modeda */
+[data-theme="light"] * {
+  /* CSS var() bilan berilgan ranglar avtomatik ishlaydi */
+}
+
+/* Filial kartadagi inline-styled bo'limlar */
+[data-theme="light"] .price-item-card,
+[data-theme="light"] .glass-panel {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #0f172a !important;
+}
+
+/* Karta ichidagi sarlavhalar va matnlar */
+[data-theme="light"] .glass-panel h2,
+[data-theme="light"] .glass-panel h3,
+[data-theme="light"] .glass-panel h4,
+[data-theme="light"] .glass-panel strong,
+[data-theme="light"] .glass-panel p,
+[data-theme="light"] .glass-panel span,
+[data-theme="light"] .price-item-card h2,
+[data-theme="light"] .price-item-card h3,
+[data-theme="light"] .price-item-card strong {
+  color: #0f172a !important;
+}
+
+/* Rasm containerlari (qora background bor edi) */
+[data-theme="light"] div[style*="background: \"var(--bg-surface-elevated)\""] {
+  background: #f1f5f9 !important;
+}
+
+/* Modal yopish tugmasi */
+[data-theme="light"] button[style*="rgba(0,0,0"] {
+  background: rgba(15, 23, 42, 0.08) !important;
+  border-color: rgba(15, 23, 42, 0.15) !important;
+}
+
+/* Qidiruv input light rejimda */
+[data-theme="light"] input[type="text"] {
+  background: rgba(15, 23, 42, 0.05) !important;
+  color: #0f172a !important;
+  border-color: rgba(8, 145, 178, 0.25) !important;
+}
+
+[data-theme="light"] input[type="text"]::placeholder {
+  color: #64748b !important;
+}
+
+/* Filial kartasidagi rasm bo'limi */
+[data-theme="light"] .price-item-card img,
+[data-theme="light"] .glass-panel img {
+  /* rasmlar o'zgarishsiz qoladi */
+}
+
+/* Nav link ranglar */
+[data-theme="light"] .nav-link {
+  color: #475569 !important;
+}
+
+[data-theme="light"] .nav-link:hover,
+[data-theme="light"] .nav-link.active {
+  color: #0f172a !important;
+}
+
+/* Page shell matnlari */
+[data-theme="light"] .page-shell h1,
+[data-theme="light"] .page-shell h2,
+[data-theme="light"] .page-shell h3 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .page-shell p,
+[data-theme="light"] .page-shell span {
+  color: #475569 !important;
+}
+
+/* Accent cyan rangdagi matnlar (yaxshi ko'rinishi uchun) */
+[data-theme="light"] .page-shell .eyebrow,
+[data-theme="light"] .page-shell .hero-tagline {
+  color: #0891b2 !important;
+}
+
+/* Metrics va section headings */
+[data-theme="light"] .section-heading h2 {
+  color: #0f172a !important;
+}
+
+/* Filiallar page title va manzil matnlar */
+[data-theme="light"] [style*="color: \"var(--text-muted)\""] {
+  color: #475569;
+}
+
+/* Modal backdrop light rejimda */
+[data-theme="light"] div[style*="rgba(0,0,0,0.85)"] {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+}
+
+/* Director bloki (bg kartasi) */
+[data-theme="light"] div[style*="var(--bg-card)"] {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(8, 145, 178, 0.2) !important;
+}
+
+/* Footer matnlar */
+[data-theme="light"] .footer-brand p,
+[data-theme="light"] .footer-links a {
+  color: #475569 !important;
+}
+
+/* Quick link karta */
+[data-theme="light"] .quick-link-content small {
+  color: #64748b !important;
+}
+
+/* Badge elementlari */
+[data-theme="light"] .page-hero .eyebrow,
+[data-theme="light"] .hero-kicker {
+  color: #0891b2 !important;
+}
+
+/* Process card matnlar */
+[data-theme="light"] .process-card h3,
+[data-theme="light"] .capability-card h3 {
+  color: #0f172a !important;
+}
+
+[data-theme="light"] .process-card p,
+[data-theme="light"] .capability-card p {
+  color: #475569 !important;
+}
+
+/* Task row */
+[data-theme="light"] .task-row p {
+  color: #0f172a !important;
+}
+
+/* Leader card */
+[data-theme="light"] .leader-info h2 {
+  color: #0f172a !important;
+}
+
+/* section matnlari */
+[data-theme="light"] .section h2,
+[data-theme="light"] .section h3,
+[data-theme="light"] .section p {
+  color: #0f172a !important;
+}
+
+/* Katta shrift matnlari */
+[data-theme="light"] .hero-tagline {
+  color: #0891b2 !important;
+}
+
+[data-theme="light"] .hero-lead {
+  color: #475569 !important;
+}
