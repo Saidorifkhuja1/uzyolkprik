@@ -37,6 +37,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("uzyol.urls")),
+    path("api/accounts/", include("accounts.urls")),
     re_path(
         r"^swagger(?P<format>\.json|\.yaml)$",
         schema_view.without_ui(cache_timeout=0),
@@ -54,6 +55,5 @@ urlpatterns = [
     ),
 ]
 
-if settings.DEBUG or True:
+if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-

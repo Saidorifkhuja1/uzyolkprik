@@ -1,0 +1,64 @@
+# ─────────────────────────────────────────────────────────────
+#  .dockerignore — Docker image ga KIRMAYDIGAN fayllar
+#  Image hajmini kichraytiradi va maxfiy fayllarni himoyalaydi
+# ─────────────────────────────────────────────────────────────
+
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Maxfiy fayllar (HECH QACHON image ga kiritilmasin!)
+.env
+.env.*
+!.env.production
+
+# Ma'lumotlar bazasi
+db.sqlite3
+*.sqlite3
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Frontend (backend image uchun kerak emas)
+frontend/node_modules/
+frontend/dist/
+frontend/.env*
+
+# Media (volume orqali mount qilinadi)
+media/
+
+# Static (collectstatic entrypoint'da bajaradi)
+staticfiles/
+
+# Testlar va docs
+tests/
+docs/
+*.md
+!README.md
+
+# Docker fayllarning o'zi (recursive qo'shilmasin)
+docker-compose*.yml
+Dockerfile*

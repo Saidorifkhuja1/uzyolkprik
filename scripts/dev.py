@@ -42,7 +42,7 @@ def main():
     run_step("backend", [PYTHON, "manage.py", "migrate"])
 
     processes = [
-        start_process("backend", [PYTHON, "manage.py", "runserver", "127.0.0.1:8000", "--noreload"]),
+        start_process("backend", [PYTHON, "manage.py", "runserver", "127.0.0.1:8000"]),
         start_process("frontend", ["npm", "run", "dev"], cwd=ROOT / "frontend"),
     ]
 

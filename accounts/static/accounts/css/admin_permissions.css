@@ -1,0 +1,42 @@
+/* Column styling for permission checkboxes matching standard Jazzmin form layout */
+
+div[class*="field-can_edit_"] {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  transition: background 0.15s ease;
+}
+
+div[class*="field-can_edit_"]:hover {
+  background: rgba(0, 123, 255, 0.03);
+}
+
+div[class*="field-can_edit_"] label {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+}
+
+div[class*="field-can_edit_"] input[type="checkbox"] {
+  width: 22px !important;
+  height: 22px !important;
+  cursor: pointer;
+  accent-color: #007bff;
+  vertical-align: middle;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  div[class*="field-can_edit_"] {
+    border-color: rgba(255, 255, 255, 0.07);
+  }
+  div[class*="field-can_edit_"]:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  div[class*="field-can_edit_"] label {
+    color: #f8fafc;
+  }
+}

@@ -6,6 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": "http://127.0.0.1:8000",
+      "/admin": "http://127.0.0.1:8000",
+      "/static": "http://127.0.0.1:8000",
       "/media": "http://127.0.0.1:8000",
       "/swagger": "http://127.0.0.1:8000",
       "/redoc": "http://127.0.0.1:8000",
