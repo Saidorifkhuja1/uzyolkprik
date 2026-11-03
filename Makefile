@@ -3,7 +3,10 @@
 #  Ishlatish: make <buyruq>
 # ─────────────────────────────────────────────────────────────
 
-.PHONY: help build up down logs shell migrate collectstatic createsuperuser restart clean
+ENV_FILE = .env.production
+DC = docker compose --env-file $(ENV_FILE)
+
+.PHONY: help build up down logs shell migrate collectstatic superuser restart clean backup
 
 help:
 	@echo ""
@@ -13,7 +16,9 @@ help:
 	@echo "  make up             - Barcha servislarni ishga tushirish"
 	@echo "  make down           - Servislarni to'xtatish"
 	@echo "  make restart        - Qayta ishga tushirish"
-	@echo "  make logs           - Loglarni ko'rish"
+	@echo "  make logs           - Barcha loglar"
+	@echo "  make logs-backend   - Backend loglari"
+	@echo "  make logs-nginx     - Nginx loglari"
 	@echo "  make shell          - Django shellga kirish"
 	@echo "  make migrate        - Migratsiyalar"
 	@echo "  make collectstatic  - Static fayllar"
@@ -24,73 +29,80 @@ help:
 
 # Build
 build:
-	docker-compose build --no-cache
+	$(DC) build --no-cache
 
 # Production ishga tushirish
 up:
-	docker-compose up -d
+	$(DC) up -d
 	@echo "✅ Servislar ishga tushdi!"
-	@echo "   Frontend: https://localhost"
-	@echo "   Admin:    https://localhost/admin/"
-	@echo "   API:      https://localhost/api/"
+	@echo "   API:     https://api.uzyulkuprik.uz/api/"
+	@echo "   Admin:   https://api.uzyulkuprik.uz/admin/"
+	@echo "   Swagger: https://api.uzyulkuprik.uz/swagger/"
+
+# Build + Up (bitta buyruq)
+deploy:
+	$(DC) up -d --build
+	@echo "✅ Deploy tugadi!"
 
 # To'xtatish
 down:
-	docker-compose down
+	$(DC) down
 
 # Qayta ishga tushirish
 restart:
-	docker-compose restart
+	$(DC) restart
 
-# Loglar
+# Barcha loglar
 logs:
-	docker-compose logs -f --tail=100
+	$(DC) logs -f --tail=100
 
 # Backend loglari
 logs-backend:
-	docker-compose logs -f backend --tail=100
+	$(DC) logs -f backend --tail=100
 
 # Nginx loglari
 logs-nginx:
-	docker-compose logs -f nginx --tail=100
+	$(DC) logs -f nginx --tail=100
 
 # Django shell
 shell:
-	docker-compose exec backend python manage.py shell
+	$(DC) exec backend python manage.py shell
 
-# Migratsiyalar (odatda entrypoint.sh da bajariladi)
+# Migratsiyalar
 migrate:
-	docker-compose exec backend python manage.py migrate
+	$(DC) exec backend python manage.py migrate
 
 # Static fayllar
 collectstatic:
-	docker-compose exec backend python manage.py collectstatic --noinput
+	$(DC) exec backend python manage.py collectstatic --noinput
 
-# Superuser yaratish
+# Superuser yaratish (qo'lda)
 superuser:
-	docker-compose exec backend python manage.py createsuperuser
+	$(DC) exec backend python manage.py createsuperuser
+
+# Konteyner holati
+status:
+	$(DC) ps
 
 # Ma'lumotlar bazasi backup
 backup:
 	@mkdir -p backups
-	docker-compose exec db pg_dump -U $${DB_USER:-postgres} $${DB_NAME:-uzyolkprik} | gzip > backups/backup_$$(date +%Y%m%d_%H%M%S).sql.gz
+	$(DC) exec db pg_dump -U $${DB_USER:-uzyolkprik_user} $${DB_NAME:-uzyolkprik} \
+		> backups/backup_$$(date +%Y%m%d_%H%M%S).sql
+	@gzip backups/backup_*.sql 2>/dev/null || true
 	@echo "✅ Backup saqlandi: backups/"
-
-# Restore
-restore:
-	@echo "Restore qilmoqchi bo'lsangiz: zcat backups/FILENAME.sql.gz | docker-compose exec -T db psql -U postgres uzyolkprik"
 
 # Tozalash
 clean:
 	docker system prune -f
 	docker volume prune -f
 
-# Development rejimida ishga tushirish
+# Development rejimi
 dev:
-	docker-compose -f docker-compose.dev.yml up
+	docker compose -f docker-compose.dev.yml up
 
 dev-build:
-	docker-compose -f docker-compose.dev.yml up --build
+	docker compose -f docker-compose.dev.yml up --build
 
 dev-down:
-	docker-compose -f docker-compose.dev.yml down
+	docker compose -f docker-compose.dev.yml down

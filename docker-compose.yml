@@ -2,18 +2,16 @@ version: "3.9"
 
 # ─────────────────────────────────────────────────────────────
 #  docker-compose.yml — Production Deploy
-#  Ishlatish: docker-compose up -d --build
+#  Ishlatish: docker compose --env-file .env.production up -d --build
 # ─────────────────────────────────────────────────────────────
 
 services:
 
-  # ── PostgreSQL Ma'lumotlar Bazasi ─────────────────────────
+  # ── PostgreSQL ────────────────────────────────────────────
   db:
     image: postgres:16-alpine
     container_name: uzyolkprik_db
     restart: unless-stopped
-    env_file:
-      - .env.production
     environment:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
@@ -28,7 +26,7 @@ services:
     networks:
       - backend_net
 
-  # ── Django Backend (Gunicorn) ──────────────────────────────
+  # ── Django Backend (Gunicorn) ─────────────────────────────
   backend:
     build:
       context: .
@@ -54,9 +52,9 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
 
-  # ── React Frontend (build + Nginx) ────────────────────────
+  # ── React Frontend (Nginx static) ─────────────────────────
   frontend:
     build:
       context: ./frontend
@@ -69,7 +67,7 @@ services:
     depends_on:
       - backend
 
-  # ── Nginx Reverse Proxy ────────────────────────────────────
+  # ── Nginx Reverse Proxy ───────────────────────────────────
   nginx:
     image: nginx:1.27-alpine
     container_name: uzyolkprik_nginx
@@ -81,16 +79,15 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/media:ro
-      # SSL sertifikatlar (Let's Encrypt)
-      - ./nginx/ssl:/etc/nginx/ssl:ro
-      - certbot_data:/var/www/certbot:ro
+      # Let's Encrypt sertifikatlar (certbot certonly --standalone bilan olinadi)
+      - /etc/letsencrypt:/etc/letsencrypt:ro
     depends_on:
       - backend
       - frontend
     networks:
       - frontend_net
 
-# ── Volumes ────────────────────────────────────────────────
+# ── Volumes ─────────────────────────────────────────────────
 volumes:
   postgres_data:
     driver: local
@@ -98,10 +95,8 @@ volumes:
     driver: local
   media_volume:
     driver: local
-  certbot_data:
-    driver: local
 
-# ── Tarmoqlar ──────────────────────────────────────────────
+# ── Tarmoqlar ────────────────────────────────────────────────
 networks:
   backend_net:
     driver: bridge

@@ -24,9 +24,9 @@ venv/
 env/
 
 # Maxfiy fayllar (HECH QACHON image ga kiritilmasin!)
+# env_file: directive orqali runtime da o'qiladi, image ichiga kirmasin
 .env
 .env.*
-!.env.production
 
 # Ma'lumotlar bazasi
 db.sqlite3
