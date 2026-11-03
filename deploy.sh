@@ -82,11 +82,11 @@ if [ ! -d "$PROJECT_DIR/.git" ]; then
     fi
     git clone "$GITHUB_REPO" "$PROJECT_DIR"
     log "Repo clone qilindi: $PROJECT_DIR"
-else
-    cd "$PROJECT_DIR"
-    git pull origin main
-    log "Repo yangilandi"
 fi
+
+cd "$PROJECT_DIR"
+git pull origin main
+log "Repo yangilandi"
 
 cd "$PROJECT_DIR"
 
