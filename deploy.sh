@@ -25,7 +25,7 @@ err()  { echo -e "${RED}❌ $1${NC}"; exit 1; }
 PROJECT_DIR="/opt/uzyolkprik"
 DOMAIN="api.uzyulkuprik.uz"
 # GitHub repo manzilingizni o'zgartiring:
-GITHUB_REPO="https://github.com/YOUR_USERNAME/YOUR_REPO.git"
+GITHUB_REPO="https://github.com/Saidorifkhuja1/uzyolkprik.git"
 
 echo ""
 echo "================================================"
