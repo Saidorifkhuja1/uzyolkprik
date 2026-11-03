@@ -53,17 +53,21 @@ python manage.py collectstatic --noinput --clear
 echo ""
 echo "👤 Superuser tekshirilmoqda..."
 python << 'PYEOF'
+import os
 import django
 django.setup()
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-username = "admin"
-password = "admin123"
+username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
+password = os.environ.get("DJANGO_SUPERUSER_PASSWORD", "")
+email    = os.environ.get("DJANGO_SUPERUSER_EMAIL", "admin@uzyolkoprik.uz")
 
-if not User.objects.filter(username=username).exists():
-    User.objects.create_superuser(username=username, password=password, email="admin@uzyolkoprik.uz")
-    print(f"✅ Superuser yaratildi: {username} / {password}")
+if not password:
+    print("⚠️  DJANGO_SUPERUSER_PASSWORD o'rnatilmagan — superuser yaratilmadi.")
+elif not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username=username, password=password, email=email)
+    print(f"✅ Superuser yaratildi: {username}")
 else:
     print(f"ℹ️  Superuser '{username}' allaqachon mavjud — o'tkazib yuborildi.")
 PYEOF

@@ -7,15 +7,17 @@ PERMISSION_FIELDS = [
     ("can_edit_site_settings", "Sayt sozlamalari"),
     ("can_edit_home_content", "Bosh sahifa kontenti"),
     ("can_edit_leaders", "Rahbariyat"),
-    ("can_edit_announcements", "E'lonlar"),
+    ("can_edit_announcements", "Faoliyatimiz (sozlamalar)"),
     ("can_edit_korxona_ustavi", "Korxona ustavi"),
     ("can_edit_tashkiliy_tuzilma", "Tashkiliy tuzilma"),
+    ("can_edit_ishlarimiz", "Ishlarimiz"),
     ("can_edit_katalog", "Katalog"),
     ("can_edit_nomenklatura", "Nomenklatura"),
     ("can_edit_narx_navo", "Narx-navo"),
     ("can_edit_vacancies", "Bo'sh ish o'rinlari"),
     ("can_edit_filiallar", "Filiallar"),
     ("can_edit_contact", "Qayta aloqa"),
+    ("can_edit_elonlar", "Faoliyatimiz"),
 ]
 
 
@@ -31,15 +33,17 @@ class AdminUserCreationForm(UserCreationForm):
     can_edit_site_settings = forms.BooleanField(required=False, label="Sayt sozlamalari")
     can_edit_home_content = forms.BooleanField(required=False, label="Bosh sahifa kontenti")
     can_edit_leaders = forms.BooleanField(required=False, label="Rahbariyat")
-    can_edit_announcements = forms.BooleanField(required=False, label="E'lonlar")
+    can_edit_announcements = forms.BooleanField(required=False, label="Faoliyatimiz (sozlamalar)")
     can_edit_korxona_ustavi = forms.BooleanField(required=False, label="Korxona ustavi")
     can_edit_tashkiliy_tuzilma = forms.BooleanField(required=False, label="Tashkiliy tuzilma")
+    can_edit_ishlarimiz = forms.BooleanField(required=False, label="Ishlarimiz")
     can_edit_katalog = forms.BooleanField(required=False, label="Katalog")
     can_edit_nomenklatura = forms.BooleanField(required=False, label="Nomenklatura")
     can_edit_narx_navo = forms.BooleanField(required=False, label="Narx-navo")
     can_edit_vacancies = forms.BooleanField(required=False, label="Bo'sh ish o'rinlari")
     can_edit_filiallar = forms.BooleanField(required=False, label="Filiallar")
     can_edit_contact = forms.BooleanField(required=False, label="Qayta aloqa")
+    can_edit_elonlar = forms.BooleanField(required=False, label="Faoliyatimiz")
 
     class Meta(UserCreationForm.Meta):
         model = User
@@ -95,15 +99,17 @@ class AdminUserChangeForm(UserChangeForm):
     can_edit_site_settings = forms.BooleanField(required=False, label="Sayt sozlamalari")
     can_edit_home_content = forms.BooleanField(required=False, label="Bosh sahifa kontenti")
     can_edit_leaders = forms.BooleanField(required=False, label="Rahbariyat")
-    can_edit_announcements = forms.BooleanField(required=False, label="E'lonlar")
+    can_edit_announcements = forms.BooleanField(required=False, label="Faoliyatimiz (sozlamalar)")
     can_edit_korxona_ustavi = forms.BooleanField(required=False, label="Korxona ustavi")
     can_edit_tashkiliy_tuzilma = forms.BooleanField(required=False, label="Tashkiliy tuzilma")
+    can_edit_ishlarimiz = forms.BooleanField(required=False, label="Ishlarimiz")
     can_edit_katalog = forms.BooleanField(required=False, label="Katalog")
     can_edit_nomenklatura = forms.BooleanField(required=False, label="Nomenklatura")
     can_edit_narx_navo = forms.BooleanField(required=False, label="Narx-navo")
     can_edit_vacancies = forms.BooleanField(required=False, label="Bo'sh ish o'rinlari")
     can_edit_filiallar = forms.BooleanField(required=False, label="Filiallar")
     can_edit_contact = forms.BooleanField(required=False, label="Qayta aloqa")
+    can_edit_elonlar = forms.BooleanField(required=False, label="Faoliyatimiz")
 
     class Meta(UserChangeForm.Meta):
         model = User

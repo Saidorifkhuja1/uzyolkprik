@@ -22,7 +22,8 @@
       "children": [
         {"label": "Korxona ustavi", "slug": "korxona-ustavi"},
         {"label": "Tashkiliy tuzilma", "slug": "tashkiliy-tuzilma"},
-        {"label": "Rahbariyat", "slug": "rahbariyat"}
+        {"label": "Rahbariyat", "slug": "rahbariyat"},
+        {"label": "Ishlarimiz", "slug": "ishlarimiz"}
       ]
     },
     {
@@ -36,7 +37,7 @@
       ]
     },
     {"label": "Filiallar", "slug": "filiallar"},
-    {"label": "Eʼlonlar", "slug": "elonlar"},
+    {"label": "Faoliyatimiz", "slug": "elonlar"},
     {"label": "Qayta aloqa", "slug": "qayta-aloqa"}
   ],
   "home": {
@@ -70,6 +71,7 @@
     {"slug": "bosh-sahifa", "title": "Bosh sahifa", "type": "home"},
     {"slug": "korxona-ustavi", "title": "Korxona ustavi", "type": "status", "status": "Ishlab chiqish bosqichida (На стадии разработки)."},
     {"slug": "tashkiliy-tuzilma", "title": "Tashkiliy tuzilma", "type": "status", "status": "Ishlab chiqish bosqichida (На стадии разработки)."},
+    {"slug": "ishlarimiz", "title": "Ishlarimiz", "type": "document", "status": "Klaster tomonidan amalga oshirilgan va davom etayotgan asosiy ishlar va loyihalar."},
     {
       "slug": "rahbariyat",
       "title": "Rahbariyat",
@@ -92,7 +94,7 @@
     },
     {
       "slug": "elonlar",
-      "title": "Eʼlonlar",
+      "title": "Faoliyatimiz",
       "type": "announcement",
       "intro": "«Узйулкуприк кластер ДМ» объявляет конкурсный торг на поставку нижеприведённого оборудования:",
       "items": [

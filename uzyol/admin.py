@@ -19,6 +19,7 @@ from .models import (
     SiteSettings,
     KorxonaUstavi,
     TashkiliyTuzilma,
+    Ishlarimiz,
     NarxNavo,
     NarxNavoProduct,
     ElonlarProduct,
@@ -140,6 +141,13 @@ class KorxonaUstaviAdmin(BaseSinglePageAdmin):
 class TashkiliyTuzilmaAdmin(BaseSinglePageAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).filter(slug="tashkiliy-tuzilma")
+
+
+@admin.register(Ishlarimiz)
+class IshlarimizAdmin(BaseSinglePageAdmin):
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(slug="ishlarimiz")
+
 
 
 
@@ -303,7 +311,7 @@ def _make_product_admin(fieldset_title="Asosiy ma'lumot"):
 
 
 @admin.register(ElonlarProduct)
-class ElonlarProductAdmin(_make_product_admin("E'lon ma'lumotlari")):
+class ElonlarProductAdmin(_make_product_admin("Faoliyatimiz ma'lumotlari")):
     pass
 
 

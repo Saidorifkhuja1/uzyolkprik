@@ -319,7 +319,7 @@ class NarxNavoProduct(models.Model):
 
 
 class ElonlarProduct(models.Model):
-    name = models.CharField(max_length=255, verbose_name="E'lon nomi")
+    name = models.CharField(max_length=255, verbose_name="Nomi / Sarlavha")
     text = models.TextField(blank=True, verbose_name="Matn (tavsif)")
     file = models.FileField(upload_to="elonlar/files/", blank=True, null=True, verbose_name="Fayl")
     image = models.ImageField(upload_to="elonlar/images/", blank=True, null=True, verbose_name="Rasm")
@@ -329,8 +329,8 @@ class ElonlarProduct(models.Model):
 
     class Meta:
         ordering = ("order", "id")
-        verbose_name = "e'lon"
-        verbose_name_plural = "e'lonlar"
+        verbose_name = "faoliyatimiz ma'lumoti"
+        verbose_name_plural = "faoliyatimiz"
 
     def __str__(self):
         return self.name
@@ -393,6 +393,14 @@ class TashkiliyTuzilma(Page):
         proxy = True
         verbose_name = "Tashkiliy tuzilma"
         verbose_name_plural = "Tashkiliy tuzilma"
+
+
+class Ishlarimiz(Page):
+    class Meta:
+        proxy = True
+        verbose_name = "Ishlarimiz"
+        verbose_name_plural = "Ishlarimiz"
+
 
 
 class NarxNavo(Page):

@@ -29,6 +29,7 @@ class PermissionsSerializer(serializers.Serializer):
     can_edit_announcements = serializers.BooleanField()
     can_edit_korxona_ustavi = serializers.BooleanField()
     can_edit_tashkiliy_tuzilma = serializers.BooleanField()
+    can_edit_ishlarimiz = serializers.BooleanField()
     can_edit_katalog = serializers.BooleanField()
     can_edit_nomenklatura = serializers.BooleanField()
     can_edit_narx_navo = serializers.BooleanField()

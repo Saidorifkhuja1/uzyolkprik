@@ -37,12 +37,11 @@ ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()]
 # ─────────────────────────────────────────────────────────
 # CSRF VA CORS SOZLAMALARI
 # ─────────────────────────────────────────────────────────
-CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:3000',
-    'http://localhost:3000',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-]
+_raw_csrf = env.str(
+    "CSRF_TRUSTED_ORIGINS",
+    default="http://127.0.0.1:3000,http://localhost:3000,http://127.0.0.1:8000,http://localhost:8000"
+)
+CSRF_TRUSTED_ORIGINS = [o.strip() for o in _raw_csrf.split(",") if o.strip()]
 
 # CORS: Faqat ro'yxatdagi domenlarga ruxsat (CORS_ALLOW_ALL_ORIGINS = False!)
 _raw_cors = env.str(
@@ -347,7 +346,7 @@ JAZZMIN_SETTINGS = {
 
     "topmenu_links": [
         {"name": "Bosh sahifa", "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "Saytga o'tish", "url": "http://127.0.0.1:3000", "new_window": True},
+        {"name": "Saytga o'tish", "url": "https://api.uzyulkuprik.uz", "new_window": True},
     ],
 
     "show_sidebar": True,

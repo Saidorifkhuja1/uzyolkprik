@@ -1,20 +1,53 @@
+# ─────────────────────────────────────────────────────────────
+#  .gitignore — Git'ga yuklanmaydigan fayllar
+# ─────────────────────────────────────────────────────────────
+
+# ── Python ────────────────────────────────────────────────────
 .venv/
 __pycache__/
 *.pyc
-backend/db.sqlite3
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# ── Django ────────────────────────────────────────────────────
 db.sqlite3
+backend/db.sqlite3
+staticfiles/
+*.log
+
+# ── IDE ───────────────────────────────────────────────────────
 .idea/
-frontend/node_modules/
-frontend/dist/
+.vscode/
+*.swp
+*.swo
 .DS_Store
 
-# Muhit o'zgaruvchilari (MAXFIY - git'ga HECH QACHON yuklamang)
-.env
-*.env
-!.env.example
-!.env.production
+# ── Frontend ──────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/
 
-# SSL sertifikatlar (MAXFIY)
+# ── Muhit o'zgaruvchilari (MAXFIY — git'ga HECH QACHON!) ─────
+.env
+.env.local
+.env.production
+.env.staging
+*.env
+# Faqat namuna fayli git'ga kiradi:
+!.env.example
+
+# ── SSL / TLS sertifikatlar (MAXFIY) ─────────────────────────
 nginx/ssl/*.key
-nginx/ssl/*.crt
 nginx/ssl/*.pem
+nginx/ssl/*.crt
+nginx/ssl/*.p12
+# Self-signed namuna fayllar ham yuklanmasin:
+nginx/ssl/
+
+# ── Backup fayllar ────────────────────────────────────────────
+backups/
+*.sql
+*.sql.gz
+*.dump

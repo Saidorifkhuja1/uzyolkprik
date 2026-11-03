@@ -33,6 +33,9 @@ class AdminProfile(models.Model):
     can_edit_tashkiliy_tuzilma = models.BooleanField(
         default=False, verbose_name="Tashkiliy tuzilma"
     )
+    can_edit_ishlarimiz = models.BooleanField(
+        default=False, verbose_name="Ishlarimiz"
+    )
     can_edit_katalog = models.BooleanField(
         default=False, verbose_name="Katalog"
     )
@@ -52,7 +55,7 @@ class AdminProfile(models.Model):
         default=False, verbose_name="Qayta aloqa"
     )
     can_edit_elonlar = models.BooleanField(
-        default=False, verbose_name="E'lonlar (product)"
+        default=False, verbose_name="Faoliyatimiz"
     )
 
     class Meta:
@@ -71,6 +74,7 @@ class AdminProfile(models.Model):
             "can_edit_announcements": self.can_edit_announcements,
             "can_edit_korxona_ustavi": self.can_edit_korxona_ustavi,
             "can_edit_tashkiliy_tuzilma": self.can_edit_tashkiliy_tuzilma,
+            "can_edit_ishlarimiz": self.can_edit_ishlarimiz,
             "can_edit_katalog": self.can_edit_katalog,
             "can_edit_nomenklatura": self.can_edit_nomenklatura,
             "can_edit_narx_navo": self.can_edit_narx_navo,
@@ -98,6 +102,7 @@ class AdminProfile(models.Model):
             "can_edit_announcements": ["announcement", "announcementitem"],
             "can_edit_korxona_ustavi": ["korxonaustavi"],
             "can_edit_tashkiliy_tuzilma": ["tashkiliytuzilma"],
+            "can_edit_ishlarimiz": ["ishlarimiz"],
             "can_edit_katalog": ["katalogpage", "catalogitem"],
             "can_edit_nomenklatura": ["nomenklaturapage"],
             "can_edit_narx_navo": ["narxnavoproduct"],

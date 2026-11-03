@@ -383,6 +383,7 @@ def _check_page_permission(user, slug):
     slug_perm_map = {
         "korxona-ustavi": profile.can_edit_korxona_ustavi,
         "tashkiliy-tuzilma": profile.can_edit_tashkiliy_tuzilma,
+        "ishlarimiz": profile.can_edit_ishlarimiz,
         "katalog": profile.can_edit_katalog,
         "nomenklatura": profile.can_edit_nomenklatura,
         "narx-navo": profile.can_edit_narx_navo,
@@ -565,11 +566,11 @@ def filiallar_list_create(request):
     POST: Yangi filial qo'shish (can_edit_filiallar yoki superuser).
     """
     if request.method == "GET":
-        can_manage = _check_filiallar_permission(request.user)
+        can_manage = _check_perm(request.user, "can_edit_filiallar")
         qs = FilialItem.objects.all() if can_manage else FilialItem.objects.filter(is_active=True)
         return Response({"results": [_serialize_filial(f) for f in qs.order_by("order", "id")]})
 
-    if not _check_filiallar_permission(request.user):
+    if not _check_perm(request.user, "can_edit_filiallar"):
         return Response(
             {"detail": "Sizda filiallar bo'limini o'zgartirish huquqi mavjud emas."},
             status=status.HTTP_403_FORBIDDEN,
@@ -622,7 +623,7 @@ def filiallar_detail_update_delete(request, pk):
     if request.method == "GET":
         return Response(_serialize_filial(filial))
 
-    if not _check_filiallar_permission(request.user):
+    if not _check_perm(request.user, "can_edit_filiallar"):
         return Response(
             {"detail": "Sizda filialni o'zgartirish yoki o'chirish huquqi mavjud emas."},
             status=status.HTTP_403_FORBIDDEN,
