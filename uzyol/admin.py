@@ -109,44 +109,45 @@ class SiteSettingsAdmin(admin.ModelAdmin):
 
 
 class BaseSinglePageAdmin(admin.ModelAdmin):
+    list_display = ("title", "slug", "is_active")
     fields = ("title", "content", "file", "image")
+    target_slug = ""
     formfield_overrides = {
         models.FileField: {'widget': UzbekClearableFileInput},
         models.ImageField: {'widget': UzbekClearableFileInput},
     }
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if self.target_slug:
+            return qs.filter(slug=self.target_slug)
+        return qs
+
+    def save_model(self, request, obj, form, change):
+        if self.target_slug and not obj.slug:
+            obj.slug = self.target_slug
+        super().save_model(request, obj, form, change)
+
     def has_add_permission(self, request):
-        return False
+        return not self.get_queryset(request).exists()
 
     def has_delete_permission(self, request, obj=None):
         return False
 
-    def changelist_view(self, request, extra_context=None):
-        obj = self.get_queryset(request).first()
-        if obj:
-            from django.urls import reverse
-            from django.shortcuts import redirect
-            url = reverse(f"admin:uzyol_{self.model._meta.model_name}_change", args=[obj.pk])
-            return redirect(url)
-        return super().changelist_view(request, extra_context)
-
 
 @admin.register(KorxonaUstavi)
 class KorxonaUstaviAdmin(BaseSinglePageAdmin):
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(slug="korxona-ustavi")
+    target_slug = "korxona-ustavi"
 
 
 @admin.register(TashkiliyTuzilma)
 class TashkiliyTuzilmaAdmin(BaseSinglePageAdmin):
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(slug="tashkiliy-tuzilma")
+    target_slug = "tashkiliy-tuzilma"
 
 
 @admin.register(Ishlarimiz)
 class IshlarimizAdmin(BaseSinglePageAdmin):
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(slug="ishlarimiz")
+    target_slug = "ishlarimiz"
 
 
 
@@ -246,14 +247,12 @@ class NarxNavoProductAdmin(admin.ModelAdmin):
 
 @admin.register(BoshIshOrinlari)
 class BoshIshOrinlariAdmin(BaseSinglePageAdmin):
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(slug="bosh-ish-orinlari")
+    target_slug = "bosh-ish-orinlari"
 
 
 @admin.register(QaytaAloqa)
 class QaytaAloqaAdmin(BaseSinglePageAdmin):
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(slug="qayta-aloqa")
+    target_slug = "qayta-aloqa"
 
 
 
@@ -322,20 +321,17 @@ class BoshIshOrinlariProductAdmin(_make_product_admin("Ish o'rni ma'lumotlari"))
 
 @admin.register(KatalogPage)
 class KatalogPageAdmin(BaseSinglePageAdmin):
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(slug="katalog")
+    target_slug = "katalog"
 
 
 @admin.register(NomenklaturaPage)
 class NomenklaturaPageAdmin(BaseSinglePageAdmin):
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(slug="nomenklatura")
+    target_slug = "nomenklatura"
 
 
 @admin.register(FiliallarPage)
 class FiliallarPageAdmin(BaseSinglePageAdmin):
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(slug="filiallar")
+    target_slug = "filiallar"
 
 
 @admin.register(FilialItem)
