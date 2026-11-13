@@ -321,7 +321,9 @@ def _page_payload(page):
     # Ishlarimiz ro'yxati
     if page.slug == "ishlarimiz":
         payload["title"] = page.title or "Ishlarimiz"
-        payload["content"] = page.content or "Oʻzyoʻlkoʻprik klasteri tomonidan amalga oshirilgan va davom etayotgan asosiy koʻprik hamda sunʼiy inshootlar loyihalari"
+        payload["content"] = ""
+        payload["imageUrl"] = None
+        payload["fileUrl"] = None
         ishlar_qs = Page.objects.filter(
             models.Q(type="ishlarimiz") | models.Q(slug__startswith="ishlarimiz-")
         ).exclude(slug="ishlarimiz").filter(is_active=True).order_by("order", "id")
@@ -347,6 +349,10 @@ def _page_payload(page):
 
     # Tashkiliy tuzilma ro'yxati
     if page.slug == "tashkiliy-tuzilma":
+        payload["title"] = page.title or "Tashkiliy tuzilma"
+        payload["content"] = ""
+        payload["imageUrl"] = None
+        payload["fileUrl"] = None
         tuzilma_qs = Page.objects.filter(
             models.Q(type="tashkiliy-tuzilma") | models.Q(slug__startswith="tashkiliy-tuzilma-")
         ).exclude(slug="tashkiliy-tuzilma").filter(is_active=True).order_by("order", "id")
@@ -372,6 +378,10 @@ def _page_payload(page):
 
     # Korxona ustavi ro'yxati
     if page.slug == "korxona-ustavi":
+        payload["title"] = page.title or "Korxona ustavi"
+        payload["content"] = ""
+        payload["imageUrl"] = None
+        payload["fileUrl"] = None
         ustav_qs = Page.objects.filter(
             models.Q(type="korxona-ustavi") | models.Q(slug__startswith="korxona-ustavi-")
         ).exclude(slug="korxona-ustavi").filter(is_active=True).order_by("order", "id")
@@ -395,6 +405,12 @@ def _page_payload(page):
         if extra_items:
             extra_items.sort(key=lambda x: (x.get("order", 0), x.get("id", 0)))
             payload["catalogItems"] = extra_items
+
+    # Katalog va Nomenklatura
+    if page.slug in ("katalog", "nomenklatura"):
+        payload["content"] = ""
+        payload["imageUrl"] = None
+        payload["fileUrl"] = None
 
     return payload
 
@@ -424,6 +440,13 @@ def _get_payload():
             slug=s_slug,
             defaults={"title": s_title, "type": s_type, "is_active": True}
         )
+
+    # Grid va hujjat sahifalaridagi ortiqcha qoldiqlarni tozalash
+    Page.objects.filter(slug__in=["ishlarimiz", "korxona-ustavi", "tashkiliy-tuzilma", "katalog", "nomenklatura"]).update(
+        image="",
+        file="",
+        content=""
+    )
 
     payload = _settings_payload(settings)
     pages = [

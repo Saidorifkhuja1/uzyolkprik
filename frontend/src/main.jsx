@@ -3561,7 +3561,7 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
                   </span>
                 </button>
               )}
-              {user?.is_superuser && (
+              {user?.is_superuser && !["ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi", "katalog", "nomenklatura"].includes(currentPage.slug) && (
                 <button
                   type="button"
                   className="btn-edit-admin"
@@ -3588,7 +3588,7 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
           </div>
         )}
 
-        {pageDesc && (
+        {pageDesc && !["ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi", "katalog", "nomenklatura"].includes(currentPage.slug) && (
           <div style={{ textAlign: "center", maxWidth: 900, margin: "0 auto 16px auto" }}>
             <p style={{ fontSize: 18, lineHeight: 1.8, color: "var(--text-muted)", whiteSpace: "pre-line" }}>
               {pageDesc}
@@ -3596,7 +3596,7 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
           </div>
         )}
 
-        {currentPage.imageUrl && (
+        {currentPage.imageUrl && !["ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi", "katalog", "nomenklatura"].includes(currentPage.slug) && (
           <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 16, display: "flex", justifyContent: "center" }}>
             <img
               src={currentPage.imageUrl}
