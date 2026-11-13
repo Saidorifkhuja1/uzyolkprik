@@ -74,6 +74,7 @@ import {
   updateVacancy,
   deleteVacancy,
   fetchCatalogItems,
+  fetchPage,
   createCatalogItem,
   updateCatalogItem,
   deleteCatalogItem,
@@ -1402,11 +1403,23 @@ function App() {
     setShowAccount(false);
   };
 
-  const handleAccountClick = () => {
+  const handleAccountClick = React.useCallback(() => {
     if (user) {
       setShowAccount(true);
     } else {
       setShowLogin(true);
+    }
+  }, [user]);
+
+  const closeAccountModals = () => {
+    setShowLogin(false);
+    setShowAccount(false);
+    const hash = window.location.hash.replace("#", "").replace(/^\//, "");
+    if (["profil", "profile", "kabinet", "login"].includes(hash)) {
+      window.location.hash = activeSlug === "bosh-sahifa" ? "" : activeSlug;
+    }
+    if (["/profil", "/profile", "/kabinet", "/login"].includes(window.location.pathname)) {
+      window.history.replaceState(null, "", "/" + (activeSlug && activeSlug !== "bosh-sahifa" ? "#" + activeSlug : ""));
     }
   };
 
@@ -1421,13 +1434,29 @@ function App() {
         setLoadError(error.message || "Sayt ma'lumotlarini yuklab bo'lmadi");
       });
 
-    const handleHashChange = () => {
-      const hash = window.location.hash.replace("#", "");
-      setActiveSlug(hash || "bosh-sahifa");
+    const checkRoute = () => {
+      const rawHash = window.location.hash.replace("#", "").replace(/^\//, "");
+      const rawPath = window.location.pathname.replace(/^\//, "");
+
+      if (["profil", "profile", "kabinet", "login"].includes(rawHash) || ["profil", "profile", "kabinet", "login"].includes(rawPath)) {
+        if (user) {
+          setShowAccount(true);
+        } else {
+          setShowLogin(true);
+        }
+      } else {
+        setActiveSlug(rawHash || "bosh-sahifa");
+      }
     };
-    window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
-  }, []);
+
+    checkRoute();
+    window.addEventListener("hashchange", checkRoute);
+    window.addEventListener("popstate", checkRoute);
+    return () => {
+      window.removeEventListener("hashchange", checkRoute);
+      window.removeEventListener("popstate", checkRoute);
+    };
+  }, [user]);
 
   const activePage = useMemo(() => {
     if (!site) return null;
@@ -1485,7 +1514,7 @@ function App() {
 
       {showLogin && (
         <LoginModal
-          onClose={() => setShowLogin(false)}
+          onClose={closeAccountModals}
           onLogin={handleLogin}
           t={t}
         />
@@ -1494,7 +1523,7 @@ function App() {
       {showAccount && user && (
         <AccountPanel
           user={user}
-          onClose={() => setShowAccount(false)}
+          onClose={closeAccountModals}
           onLogout={handleLogout}
           onNavigate={navigate}
           t={t}
@@ -1649,16 +1678,20 @@ function Header({
             <Search size={18} />
           </button>
 
-          <button
-            className={`account-button ${user ? "is-logged-in" : ""}`}
-            onClick={onAccountClick}
-            title={user ? `${user.username} (${t.account || "Kabinet"})` : (t.login || "Kirish")}
-            aria-label={t.account || "Kabinet"}
-          >
-            {user ? <Shield size={16} /> : <Lock size={16} />}
-            <span>{user ? user.username : (t.login || "Kirish")}</span>
-            {user && <span className="account-dot" />}
-          </button>
+          {/* User tizimga kirgandan keyin profil tugmasi chiqadi */}
+          {user && (
+            <button
+              className="account-button is-logged-in"
+              onClick={onAccountClick}
+              title={`${user.username} (${t.account || "Kabinet"})`}
+              aria-label={t.account || "Kabinet"}
+            >
+              <Shield size={16} />
+              <span>{user.username}</span>
+              <span className="account-dot" />
+            </button>
+          )}
+
           <button
             className="menu-button"
             aria-label="Menyuni ochish"
@@ -3004,10 +3037,14 @@ function PageEditModal({ isOpen, page, onClose, onSave, t }) {
 
 function CatalogItemModal({ isOpen, mode, item, slug, onClose, onSave, t }) {
   const isEdit = mode === "edit";
+  const isIshlarimiz = slug === "ishlarimiz";
+  const isTashkiliy = slug === "tashkiliy-tuzilma";
   const [title, setTitle] = useState(isEdit && item ? item.title || "" : "");
   const [description, setDescription] = useState(isEdit && item ? item.description || "" : "");
   const [fileUrl, setFileUrl] = useState(isEdit && item ? item.fileUrl || "" : "");
   const [file, setFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(isEdit && item ? item.imageUrl || null : null);
   const [order, setOrder] = useState(isEdit && item ? item.order ?? 0 : 0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -3017,7 +3054,13 @@ function CatalogItemModal({ isOpen, mode, item, slug, onClose, onSave, t }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!title.trim()) {
-      setError("Hujjat nomini kiriting.");
+      setError(
+        isIshlarimiz
+          ? "Loyiha nomini kiriting."
+          : isTashkiliy
+            ? "Bo'lim nomini kiriting."
+            : "Hujjat nomini kiriting."
+      );
       return;
     }
     setSaving(true);
@@ -3030,6 +3073,7 @@ function CatalogItemModal({ isOpen, mode, item, slug, onClose, onSave, t }) {
       fd.append("page_slug", slug);
       fd.append("order", String(order || 0));
       if (file) fd.append("file", file);
+      if (imageFile) fd.append("image", imageFile);
 
       await onSave(fd, isEdit ? item?.id : null);
       onClose();
@@ -3039,6 +3083,24 @@ function CatalogItemModal({ isOpen, mode, item, slug, onClose, onSave, t }) {
       setSaving(false);
     }
   };
+
+  const modalTitle = isEdit
+    ? isIshlarimiz
+      ? "Loyihani tahrirlash"
+      : isTashkiliy
+        ? "Bo'limni tahrirlash"
+        : "Hujjatni tahrirlash"
+    : isIshlarimiz
+      ? "Yangi ish qo'shish"
+      : isTashkiliy
+        ? "Yangi bo'lim qo'shish"
+        : "Yangi hujjat qo'shish";
+
+  const modalSubtitle = isIshlarimiz
+    ? "Loyiha nomi, tavsifi, rasmi va hujjatini yuklang."
+    : isTashkiliy
+      ? "Bo'lim nomi, vazifalari, rasmi yoki sxemasi va tegishli hujjatini yuklang."
+      : "Hujjat nomi, tavsifi va faylini yuklang.";
 
   return (
     <div className="account-modal-backdrop" onClick={onClose}>
@@ -3051,8 +3113,8 @@ function CatalogItemModal({ isOpen, mode, item, slug, onClose, onSave, t }) {
           <div className="account-icon-box">
             {isEdit ? <Pencil size={24} /> : <Plus size={24} />}
           </div>
-          <h3>{isEdit ? "Hujjatni tahrirlash" : "Yangi hujjat qo'shish"}</h3>
-          <p>Hujjat nomi, tavsifi va faylini yuklang.</p>
+          <h3>{modalTitle}</h3>
+          <p>{modalSubtitle}</p>
         </div>
 
         {error && (
@@ -3064,16 +3126,34 @@ function CatalogItemModal({ isOpen, mode, item, slug, onClose, onSave, t }) {
 
         <form onSubmit={handleSubmit} className="elon-form">
           <div className="modal-section-box">
-            <h4 className="modal-section-title">Hujjat nomi va tartibi</h4>
+            <h4 className="modal-section-title">
+              {isIshlarimiz
+                ? "Loyiha ma'lumotlari"
+                : isTashkiliy
+                  ? "Bo'lim / Tuzilma ma'lumotlari"
+                  : "Hujjat nomi va tartibi"}
+            </h4>
             <div className="elon-form-row">
               <div className="elon-form-group" style={{ flex: 2 }}>
-                <label>Hujjat nomi / Sarlavhasi</label>
+                <label>
+                  {isIshlarimiz
+                    ? "Loyiha nomi / Sarlavhasi"
+                    : isTashkiliy
+                      ? "Bo'lim / Boshqarma nomi"
+                      : "Hujjat nomi / Sarlavhasi"}
+                </label>
                 <input
                   type="text"
                   className="elon-form-input"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Masalan: Maxsus texnikalar katalogi 2026.pdf"
+                  placeholder={
+                    isIshlarimiz
+                      ? "Masalan: Toshkent shahridagi yangi ko'prik qurilishi"
+                      : isTashkiliy
+                        ? "Masalan: Bosh muhandislik bo'limi"
+                        : "Masalan: Maxsus texnikalar katalogi 2026.pdf"
+                  }
                   required
                 />
               </div>
@@ -3089,21 +3169,138 @@ function CatalogItemModal({ isOpen, mode, item, slug, onClose, onSave, t }) {
             </div>
 
             <div className="elon-form-group">
-              <label>Qisqacha tavsif</label>
+              <label>
+                {isIshlarimiz
+                  ? "Batafsil matn / Tavsif"
+                  : isTashkiliy
+                    ? "Bo'lim vazifalari / Tavsif"
+                    : "Qisqacha tavsif"}
+              </label>
               <textarea
                 rows={3}
                 className="elon-form-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Hujjat haqida qisqacha ma'lumot..."
+                placeholder={
+                  isIshlarimiz
+                    ? "Loyiha haqida to'liq ma'lumot..."
+                    : isTashkiliy
+                      ? "Bo'lim vazifalari va faoliyati haqida ma'lumot..."
+                      : "Hujjat haqida qisqacha ma'lumot..."
+                }
               />
             </div>
           </div>
 
+          {/* Rasm yuklash (Image) */}
           <div className="modal-section-box">
-            <h4 className="modal-section-title">Fayl yoki Tashqi havola</h4>
+            <h4 className="modal-section-title">
+              {isIshlarimiz
+                ? "Loyiha rasmi (Image)"
+                : isTashkiliy
+                  ? "Bo'lim rasmi / Sxemasi (Image)"
+                  : "Rasm yuklash (Ixtiyoriy)"}
+            </h4>
             <div className="elon-form-group">
-              <label>Hujjat fayli (PDF yoki Rasm)</label>
+              {imagePreview ? (
+                <div className="media-preview-card" style={{ flexDirection: "column", alignItems: "flex-start" }}>
+                  <img
+                    src={imagePreview}
+                    alt=""
+                    style={{ width: "100%", maxHeight: 200, objectFit: "cover", borderRadius: 8, marginBottom: 8 }}
+                  />
+                  <button
+                    type="button"
+                    className="media-preview-remove"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview(null);
+                    }}
+                  >
+                    <Trash2 size={12} />
+                    <span>Rasmni o'chirish</span>
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="file"
+                    id="catalog-image-input"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) {
+                        setImageFile(f);
+                        setImagePreview(URL.createObjectURL(f));
+                      }
+                    }}
+                  />
+                  <label htmlFor="catalog-image-input" className="file-dropzone-btn">
+                    <ImageIcon size={16} />
+                    <span>Kompyuterdan rasm tanlash</span>
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="modal-section-box">
+            <h4 className="modal-section-title">
+              {isIshlarimiz
+                ? "Loyiha hujjati (PDF yoki fayl)"
+                : isTashkiliy
+                  ? "Bo'lim nizomi yoki hujjati (PDF / Fayl)"
+                  : "Fayl yoki Tashqi havola (Hujjat)"}
+            </h4>
+            <div className="elon-form-group">
+              {imagePreview ? (
+                <div className="media-preview-card" style={{ flexDirection: "column", alignItems: "flex-start" }}>
+                  <img
+                    src={imagePreview}
+                    alt=""
+                    style={{ width: "100%", maxHeight: 200, objectFit: "cover", borderRadius: 8, marginBottom: 8 }}
+                  />
+                  <button
+                    type="button"
+                    className="media-preview-remove"
+                    onClick={() => {
+                      setImageFile(null);
+                      setImagePreview(null);
+                    }}
+                  >
+                    <Trash2 size={12} />
+                    <span>Rasmni o'chirish</span>
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="file"
+                    id="catalog-image-input"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      if (f) {
+                        setImageFile(f);
+                        setImagePreview(URL.createObjectURL(f));
+                      }
+                    }}
+                  />
+                  <label htmlFor="catalog-image-input" className="file-dropzone-btn">
+                    <ImageIcon size={16} />
+                    <span>Kompyuterdan rasm tanlash</span>
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="modal-section-box">
+            <h4 className="modal-section-title">Fayl yoki Tashqi havola (Hujjat)</h4>
+            <div className="elon-form-group">
+              <label>Hujjat fayli (PDF / Word / Fayl)</label>
               {file ? (
                 <div className="media-preview-card">
                   <div className="media-preview-thumb" style={{ display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(14, 165, 233, 0.15)" }}>
@@ -3132,7 +3329,7 @@ function CatalogItemModal({ isOpen, mode, item, slug, onClose, onSave, t }) {
                   />
                   <label htmlFor="catalog-file-input" className="file-dropzone-btn">
                     <Paperclip size={16} />
-                    <span>Fayl yuklash (PDF / Rasm)</span>
+                    <span>Kompyuterdan fayl yuklash (PDF / Doc)</span>
                   </label>
                 </div>
               )}
@@ -3194,8 +3391,18 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
   const [activeDocItem, setActiveDocItem] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [selectedIsh, setSelectedIsh] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    if (!selectedIsh) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setSelectedIsh(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedIsh]);
 
   useEffect(() => {
     setCurrentPage(page);
@@ -3205,7 +3412,14 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
   const reloadCatalogItems = async () => {
     try {
       const token = getStoredToken();
-      const res = await fetchCatalogItems(page.slug, token);
+      if (["ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi"].includes(currentPage.slug)) {
+        const pageData = await fetchPage(currentPage.slug);
+        if (pageData?.catalogItems) {
+          setCatalogItems(pageData.catalogItems);
+          return;
+        }
+      }
+      const res = await fetchCatalogItems(currentPage.slug, token);
       setCatalogItems(res.results || []);
     } catch (err) {
       console.error(err);
@@ -3227,12 +3441,18 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
 
   const handleSaveDocItem = async (formData, id) => {
     const token = getStoredToken();
+    const itemNoun =
+      currentPage.slug === "ishlarimiz"
+        ? "Loyiha"
+        : currentPage.slug === "tashkiliy-tuzilma"
+          ? "Bo'lim"
+          : "Hujjat";
     if (id) {
       await updateCatalogItem(id, formData, token);
-      setSuccessMsg("Hujjat muvaffaqiyatli yangilandi!");
+      setSuccessMsg(`${itemNoun} muvaffaqiyatli yangilandi!`);
     } else {
       await createCatalogItem(formData, token);
-      setSuccessMsg("Yangi hujjat muvaffaqiyatli qo'shildi!");
+      setSuccessMsg(`Yangi ${itemNoun.toLowerCase()} muvaffaqiyatli qo'shildi!`);
     }
     await reloadCatalogItems();
     setTimeout(() => setSuccessMsg(null), 3500);
@@ -3241,10 +3461,16 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
   const handleConfirmDeleteDoc = async () => {
     if (!deleteTarget) return;
     setDeleting(true);
+    const itemNoun =
+      currentPage.slug === "ishlarimiz"
+        ? "Loyiha"
+        : currentPage.slug === "tashkiliy-tuzilma"
+          ? "Bo'lim"
+          : "Hujjat";
     try {
       const token = getStoredToken();
       await deleteCatalogItem(deleteTarget.id, token);
-      setSuccessMsg("Hujjat muvaffaqiyatli o'chirildi!");
+      setSuccessMsg(`${itemNoun} muvaffaqiyatli o'chirildi!`);
       setDeleteTarget(null);
       await reloadCatalogItems();
       setTimeout(() => setSuccessMsg(null), 3500);
@@ -3256,33 +3482,34 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
     }
   };
 
-  const defaultDesc = currentPage.slug === "katalog"
-    ? t.catalogDefaultDesc
-    : currentPage.slug === "nomenklatura"
-      ? t.nomDefaultDesc
-      : "";
+  const pageDesc = currentPage.content || "";
 
-  const pageDesc = currentPage.content || defaultDesc;
+  const isCatalogPage = ["katalog", "nomenklatura", "ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi"].includes(currentPage.slug);
+  const isGridPage = ["ishlarimiz", "tashkiliy-tuzilma"].includes(currentPage.slug);
 
   let allItems = [];
-  if (currentPage.fileUrl) {
-    allItems.push({
-      id: "page-main-file",
-      title: getNavTitle(currentPage.slug, currentPage.title, t),
-      fileUrl: currentPage.fileUrl,
-      embedUrl: currentPage.fileUrl,
-      isMain: true,
-    });
+  if (isGridPage || ["katalog", "nomenklatura"].includes(currentPage.slug)) {
+    allItems = catalogItems || [];
+  } else {
+    if (catalogItems && catalogItems.length > 0) {
+      allItems = [...catalogItems];
+    } else if (currentPage.fileUrl) {
+      allItems.push({
+        id: "page-main-file",
+        title: currentPage.title || getNavTitle(currentPage.slug, currentPage.title, t),
+        fileUrl: currentPage.fileUrl,
+        embedUrl: currentPage.fileUrl,
+        isMain: true,
+      });
+    }
   }
-  if (catalogItems && catalogItems.length > 0) {
-    allItems = allItems.concat(catalogItems);
-  }
-
-  const isCatalogPage = ["katalog", "nomenklatura"].includes(currentPage.slug);
 
   return (
     <section className="page-shell">
-      <PageHero title={getNavTitle(currentPage.slug, currentPage.title, t)} label={t.zavodLabel} />
+      <PageHero
+        title={getNavTitle(currentPage.slug, currentPage.title, t)}
+        label={["ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi", "rahbariyat"].includes(currentPage.slug) ? (t.nav?.["korxona-haqida"] || "Korxona haqida") : t.zavodLabel}
+      />
 
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "grid", gap: 32, width: "100%" }}>
         {canManage && (
@@ -3292,8 +3519,24 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
                 <FileText size={22} style={{ color: "var(--accent-cyan)" }} />
               </div>
               <div>
-                <h3 className="elon-toolbar-title">{t.editPageTitle || "Sahifani boshqarish"}</h3>
-                <p className="elon-toolbar-desc">{t.editPageNotice || "Sizga ushbu sahifa matni, rasmi va hujjatlarini o'zgartirish huquqi berilgan."}</p>
+                <h3 className="elon-toolbar-title">
+                  {currentPage.slug === "ishlarimiz"
+                    ? "Ishlarimizni boshqarish"
+                    : currentPage.slug === "tashkiliy-tuzilma"
+                      ? "Tashkiliy tuzilmani boshqarish"
+                      : currentPage.slug === "korxona-ustavi"
+                        ? "Korxona ustavini boshqarish"
+                        : (t.editPageTitle || "Hujjatlarni boshqarish")}
+                </h3>
+                <p className="elon-toolbar-desc">
+                  {currentPage.slug === "ishlarimiz"
+                    ? "Sizda yangi loyihalarni qo'shish, tahrirlash va o'chirish huquqi mavjud."
+                    : currentPage.slug === "tashkiliy-tuzilma"
+                      ? "Sizda yangi bo'lim va tuzilma ma'lumotlarini qo'shish, tahrirlash va o'chirish huquqi mavjud."
+                      : currentPage.slug === "korxona-ustavi"
+                        ? "Sizda yangi ustav hujjatlarini qo'shish, tahrirlash va o'chirish huquqi mavjud."
+                        : (t.editPageNotice || "Sizga ushbu sahifa hujjatlarini o'zgartirish huquqi berilgan.")}
+                </p>
               </div>
             </div>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -3307,18 +3550,27 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
                   }}
                 >
                   <Plus size={16} />
-                  <span>Yangi hujjat qo'shish</span>
+                  <span>
+                    {currentPage.slug === "ishlarimiz"
+                      ? "Yangi ish qo'shish"
+                      : currentPage.slug === "tashkiliy-tuzilma"
+                        ? "Yangi bo'lim qo'shish"
+                        : currentPage.slug === "korxona-ustavi"
+                          ? "Yangi hujjat qo'shish"
+                          : "Yangi hujjat qo'shish"}
+                  </span>
                 </button>
               )}
-              <button
-                type="button"
-                className="btn-add-elon secondary"
-                style={{ background: "rgba(255,255,255,0.08)", border: "1px solid var(--border-bright)" }}
-                onClick={() => setIsEditOpen(true)}
-              >
-                <Pencil size={16} />
-                <span>{t.editPageBtn || "Sahifani tahrirlash"}</span>
-              </button>
+              {user?.is_superuser && (
+                <button
+                  type="button"
+                  className="btn-edit-admin"
+                  onClick={() => setIsEditOpen(true)}
+                >
+                  <Pencil size={15} />
+                  <span>{t.editPage || "Sahifani tahrirlash"}</span>
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -3354,88 +3606,241 @@ function DocumentPage({ page, site, t, user, onNavigate }) {
           </div>
         )}
 
-        {allItems.map((item, index) => {
-          const embed = item.embedUrl;
-          const isImage = /\.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjpg|png|svg|webp)$/i.test(item.fileUrl);
+        {isGridPage ? (
+          <div className="ishlarimiz-grid">
+            {allItems.map((item, index) => {
+              const imgSrc = item.imageUrl || item.embedUrl || (/\.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjpg|png|svg|webp)$/i.test(item.fileUrl || "") ? item.fileUrl : null);
+              const isActualFile = Boolean(item.fileUrl && !/\.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjpg|png|svg|webp)$/i.test(item.fileUrl));
 
-          return (
-            <div key={item.id || index} className="glass-panel" style={{ padding: 28, position: "relative", display: "grid", gap: 20 }}>
-              {canManage && !item.isMain && (
-                <div
-                  className="elon-card-admin-actions"
-                  style={{ position: "absolute", top: 16, right: 16, zIndex: 5 }}
+              return (
+                <article
+                  key={item.id || index}
+                  className="ishlar-card glass-panel"
+                  onClick={() => setSelectedIsh({ ...item, imgSrc, isActualFile })}
+                  style={{ cursor: "pointer" }}
                 >
-                  <button
-                    type="button"
-                    className="elon-btn-icon edit"
-                    onClick={() => {
-                      setActiveDocItem(item);
-                      setDocModalMode("edit");
-                    }}
-                    title="Tahrirlash"
+                  {canManage && !item.isMain && (
+                    <div
+                      className="elon-card-admin-actions"
+                      style={{ position: "absolute", top: 14, right: 14, zIndex: 5 }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        type="button"
+                        className="elon-btn-icon edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveDocItem(item);
+                          setDocModalMode("edit");
+                        }}
+                        title="Tahrirlash"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        type="button"
+                        className="elon-btn-icon delete"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeleteTarget(item);
+                        }}
+                        title="O'chirish"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  )}
+
+                  {imgSrc ? (
+                    <div className="ishlar-card-media">
+                      <img src={imgSrc} alt={item.title} />
+                    </div>
+                  ) : (
+                    <div className="ishlar-card-placeholder">
+                      {currentPage.slug === "tashkiliy-tuzilma" ? (
+                        <Layers size={42} style={{ color: "var(--accent-cyan)", opacity: 0.7 }} />
+                      ) : (
+                        <Building2 size={42} style={{ color: "var(--accent-cyan)", opacity: 0.7 }} />
+                      )}
+                    </div>
+                  )}
+
+                  <div className="ishlar-card-content">
+                    <h3 className="ishlar-card-title">{item.title}</h3>
+                    {item.description && (
+                      <p className="ishlar-card-desc">{item.description}</p>
+                    )}
+                    <div className="ishlar-card-footer">
+                      <button
+                        type="button"
+                        className="btn-details-ishlar"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedIsh({ ...item, imgSrc, isActualFile });
+                        }}
+                      >
+                        <span>{t.viewDetails || "Batafsil ko'rish"}</span>
+                        <ArrowRight size={14} />
+                      </button>
+                      {isActualFile && (
+                        <a
+                          href={item.fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn-primary ishlar-download-btn"
+                          download
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span>{t.downloadDoc || "Hujjat"}</span>
+                          <ExternalLink size={14} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          allItems.map((item, index) => {
+            const embed = item.embedUrl;
+            const isImage = /\.(apng|avif|gif|jpg|jpeg|jfif|pjpeg|pjpg|png|svg|webp)$/i.test(item.fileUrl);
+
+            return (
+              <div key={item.id || index} className="glass-panel" style={{ padding: 28, position: "relative", display: "grid", gap: 20 }}>
+                {canManage && !item.isMain && (
+                  <div
+                    className="elon-card-admin-actions"
+                    style={{ position: "absolute", top: 16, right: 16, zIndex: 5 }}
                   >
-                    <Pencil size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    className="elon-btn-icon delete"
-                    onClick={() => setDeleteTarget(item)}
-                    title="O'chirish"
+                    <button
+                      type="button"
+                      className="elon-btn-icon edit"
+                      onClick={() => {
+                        setActiveDocItem(item);
+                        setDocModalMode("edit");
+                      }}
+                      title="Tahrirlash"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      className="elon-btn-icon delete"
+                      onClick={() => setDeleteTarget(item)}
+                      title="O'chirish"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                )}
+
+                <div>
+                  <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-main)", margin: 0 }}>
+                    {item.title}
+                  </h3>
+                  {item.description && (
+                    <p style={{ fontSize: 15, color: "var(--text-muted)", marginTop: 6, lineHeight: 1.6 }}>
+                      {item.description}
+                    </p>
+                  )}
+                </div>
+
+                {embed && isImage && (
+                  <div style={{ display: "flex", justifyContent: "center" }}>
+                    <img
+                      src={embed}
+                      alt={item.title}
+                      style={{ width: "100%", maxHeight: 600, objectFit: "contain", borderRadius: 8 }}
+                    />
+                  </div>
+                )}
+
+                {embed && !isImage && (
+                  <div className="pdf-embed-container" style={{ marginTop: 0 }}>
+                    <iframe
+                      src={embed}
+                      className="pdf-embed-frame"
+                      title={item.title}
+                      allow="autoplay"
+                    />
+                  </div>
+                )}
+
+                <div style={{ display: "flex", justifyContent: "center", marginTop: 4 }}>
+                  <a
+                    href={item.fileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="btn-primary"
+                    style={{ padding: "14px 32px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }}
+                    download
                   >
-                    <Trash2 size={14} />
-                  </button>
+                    <span>{t.downloadDoc}</span>
+                    <ExternalLink size={16} />
+                  </a>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Ishlarimiz Batafsil Modali */}
+      {selectedIsh && (
+        <div
+          className="detail-modal-backdrop"
+          onClick={() => setSelectedIsh(null)}
+        >
+          <div
+            className="detail-modal-card glass-panel"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="detail-modal-close"
+              onClick={() => setSelectedIsh(null)}
+              title="Yopish"
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ overflowY: "auto", flex: 1, maxHeight: "90vh" }}>
+              {selectedIsh.imgSrc && (
+                <div className="detail-modal-media">
+                  <img src={selectedIsh.imgSrc} alt={selectedIsh.title} />
                 </div>
               )}
 
-              <div>
-                <h3 style={{ fontSize: 20, fontWeight: 700, color: "var(--text-main)", margin: 0 }}>
-                  {item.title}
-                </h3>
-                {item.description && (
-                  <p style={{ fontSize: 15, color: "var(--text-muted)", marginTop: 6, lineHeight: 1.6 }}>
-                    {item.description}
-                  </p>
+              <div className="detail-modal-body">
+                <h2 className="detail-modal-title">{selectedIsh.title}</h2>
+
+                {selectedIsh.description && (
+                  <div className="detail-modal-desc">
+                    <p>{selectedIsh.description}</p>
+                  </div>
+                )}
+
+                {selectedIsh.isActualFile && (
+                  <div className="detail-modal-actions">
+                    <a
+                      href={selectedIsh.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-primary"
+                      style={{ padding: "12px 28px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }}
+                      download
+                    >
+                      <span>{t.downloadDoc || "Hujjatni yuklab olish"}</span>
+                      <Download size={16} />
+                    </a>
+                  </div>
                 )}
               </div>
-
-              {embed && isImage && (
-                <div style={{ display: "flex", justifyContent: "center" }}>
-                  <img
-                    src={embed}
-                    alt={item.title}
-                    style={{ width: "100%", maxHeight: 600, objectFit: "contain", borderRadius: 8 }}
-                  />
-                </div>
-              )}
-
-              {embed && !isImage && (
-                <div className="pdf-embed-container" style={{ marginTop: 0 }}>
-                  <iframe
-                    src={embed}
-                    className="pdf-embed-frame"
-                    title={item.title}
-                    allow="autoplay"
-                  />
-                </div>
-              )}
-
-              <div style={{ display: "flex", justifyContent: "center", marginTop: 4 }}>
-                <a
-                  href={item.fileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn-primary"
-                  style={{ padding: "14px 32px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }}
-                  download
-                >
-                  <span>{t.downloadDoc}</span>
-                  <ExternalLink size={16} />
-                </a>
-              </div>
             </div>
-          );
-        })}
-      </div>
+          </div>
+        </div>
+      )}
 
       <PageEditModal
         isOpen={isEditOpen}
@@ -3906,8 +4311,18 @@ function Announcement({ page, t, lang, user, onNavigate }) {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
   const [lightboxImg, setLightboxImg] = useState(null);
+  const [selectedElon, setSelectedElon] = useState(null);
   const [successMsg, setSuccessMsg] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    if (!selectedElon) return;
+    const onKey = (e) => {
+      if (e.key === "Escape") setSelectedElon(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [selectedElon]);
 
   // Announcement page settings state
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -4021,28 +4436,6 @@ function Announcement({ page, t, lang, user, onNavigate }) {
             </div>
           </div>
           <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            {canManageAnnouncements && (
-              <button
-                type="button"
-                className="btn-edit-admin"
-                onClick={() => setIsSettingsOpen(true)}
-                style={{
-                  background: "rgba(14, 165, 233, 0.15)",
-                  color: "var(--accent-cyan)",
-                  border: "1px solid var(--accent-cyan)",
-                  padding: "9px 16px",
-                  borderRadius: "8px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                <Pencil size={16} />
-                <span>Texnika ro'yxati & sozlamalar</span>
-              </button>
-            )}
             {canManageElonlar && (
               <button
                 type="button"
@@ -4102,21 +4495,29 @@ function Announcement({ page, t, lang, user, onNavigate }) {
       ) : (
         <div className="elonlar-grid">
           {elonlar.map((item) => (
-            <article className={`elon-card glass-panel ${!item.is_active ? "inactive" : ""}`} key={item.id}>
+            <article
+              className={`elon-card glass-panel ${!item.is_active ? "inactive" : ""}`}
+              key={item.id}
+              onClick={() => setSelectedElon(item)}
+              style={{ cursor: "pointer" }}
+            >
               <div className="elon-card-top-bar">
                 <div className="elon-date-tag">
                   <Calendar size={13} />
                   <span>{formatElonDate(item.created_at)}</span>
                 </div>
                 {canManageElonlar && (
-                  <div className="elon-card-admin-actions">
+                  <div className="elon-card-admin-actions" onClick={(e) => e.stopPropagation()}>
                     {!item.is_active && (
                       <span className="elon-badge-draft">Qoralama</span>
                     )}
                     <button
                       type="button"
                       className="elon-btn-icon edit"
-                      onClick={() => handleOpenEdit(item)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpenEdit(item);
+                      }}
                       title={t.editAnnouncement || "Tahrirlash"}
                     >
                       <Pencil size={14} />
@@ -4124,7 +4525,10 @@ function Announcement({ page, t, lang, user, onNavigate }) {
                     <button
                       type="button"
                       className="elon-btn-icon delete"
-                      onClick={() => setDeleteTarget(item)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteTarget(item);
+                      }}
                       title={t.deleteAnnouncement || "O'chirish"}
                     >
                       <Trash2 size={14} />
@@ -4134,11 +4538,17 @@ function Announcement({ page, t, lang, user, onNavigate }) {
               </div>
 
               {item.image && (
-                <div className="elon-card-image-wrap" onClick={() => setLightboxImg(item.image)}>
+                <div
+                  className="elon-card-image-wrap"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedElon(item);
+                  }}
+                >
                   <img src={item.image} alt={item.name} loading="lazy" />
                   <div className="elon-zoom-hint">
                     <Eye size={16} />
-                    <span>Kattalashtirish</span>
+                    <span>{t.viewDetails || "Batafsil"}</span>
                   </div>
                 </div>
               )}
@@ -4146,16 +4556,23 @@ function Announcement({ page, t, lang, user, onNavigate }) {
               <div className="elon-card-content">
                 <h3 className="elon-card-title">{item.name}</h3>
                 {item.text && <p className="elon-card-text">{item.text}</p>}
+                <div style={{ marginTop: "auto", paddingTop: 14 }}>
+                  <span className="btn-details-ishlar">
+                    <span>{t.viewDetails || "Batafsil ko'rish"}</span>
+                    <ArrowRight size={14} />
+                  </span>
+                </div>
               </div>
 
               {item.file && (
-                <div className="elon-card-footer">
+                <div className="elon-card-footer" onClick={(e) => e.stopPropagation()}>
                   <a
                     href={item.file}
                     target="_blank"
                     rel="noreferrer"
                     className="elon-attachment-btn"
                     download
+                    onClick={(e) => e.stopPropagation()}
                   >
                     <Paperclip size={14} />
                     <span>{t.downloadAttachment || "Hujjatni yuklab olish"}</span>
@@ -4168,57 +4585,6 @@ function Announcement({ page, t, lang, user, onNavigate }) {
         </div>
       )}
 
-      {/* Equipment List & Proposals Card */}
-      <div className="announcement-box" style={{ marginTop: 40, position: "relative" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <h3 style={{ fontSize: 18, color: "var(--text-main)", fontWeight: 700, margin: 0 }}>
-            {t.equipmentListTitle || "Xarid qilinadigan texnika va uskunalar ro'yxati:"}
-          </h3>
-          {canManageAnnouncements && (
-            <button
-              type="button"
-              className="btn-edit-admin"
-              onClick={() => setIsSettingsOpen(true)}
-              style={{
-                background: "rgba(14, 165, 233, 0.15)",
-                color: "var(--accent-cyan)",
-                border: "1px solid var(--accent-cyan)",
-                padding: "6px 12px",
-                borderRadius: "6px",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-              title="Ro'yxatni tahrirlash"
-            >
-              <Pencil size={13} />
-              <span>Tahrirlash</span>
-            </button>
-          )}
-        </div>
-        <p style={{ fontSize: 15, color: "var(--text-muted)", marginBottom: 20 }}>{introText}</p>
-        <div className="equipment-grid">
-          {items.map((item) => (
-            <div className="equipment-badge" key={item}>
-              <Wrench size={18} style={{ color: "var(--accent-cyan)" }} />
-              <span>{item}</span>
-            </div>
-          ))}
-        </div>
-        <div className="proposal-card">
-          <Mail size={24} style={{ color: "var(--accent-cyan)" }} />
-          <div>
-            <span style={{ color: "var(--text-muted)", display: "block", fontSize: 13 }}>
-              {t.emailLabel}
-            </span>
-            <a href={`mailto:${pageEmail}`}>{pageEmail}</a>
-          </div>
-        </div>
-      </div>
-
       {/* Modals */}
       <ElonModal
         isOpen={Boolean(modalMode)}
@@ -4226,14 +4592,6 @@ function Announcement({ page, t, lang, user, onNavigate }) {
         elon={activeElon}
         onClose={() => setModalMode(null)}
         onSave={handleSaveElon}
-        t={t}
-      />
-
-      <AnnouncementSettingsModal
-        isOpen={isSettingsOpen}
-        initialData={announcementSettings}
-        onClose={() => setIsSettingsOpen(false)}
-        onSave={handleSaveSettings}
         t={t}
       />
 
@@ -4250,6 +4608,76 @@ function Announcement({ page, t, lang, user, onNavigate }) {
         imageUrl={lightboxImg}
         onClose={() => setLightboxImg(null)}
       />
+
+      {/* Faoliyatimiz Batafsil Modali */}
+      {selectedElon && (
+        <div
+          className="detail-modal-backdrop"
+          onClick={() => setSelectedElon(null)}
+        >
+          <div
+            className="detail-modal-card glass-panel"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="detail-modal-close"
+              onClick={() => setSelectedElon(null)}
+              title="Yopish"
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ overflowY: "auto", flex: 1, maxHeight: "90vh" }}>
+              {selectedElon.image && (
+                <div className="detail-modal-media">
+                  <img src={selectedElon.image} alt={selectedElon.name} />
+                </div>
+              )}
+
+              <div className="detail-modal-body">
+                <div className="detail-modal-meta">
+                  <div className="elon-date-tag">
+                    <Calendar size={13} />
+                    <span>{formatElonDate(selectedElon.created_at)}</span>
+                  </div>
+                  <span className="detail-modal-badge">
+                    {t.nav?.["elonlar"] || "Faoliyatimiz"}
+                  </span>
+                  {!selectedElon.is_active && (
+                    <span className="elon-badge-draft">Qoralama</span>
+                  )}
+                </div>
+
+                <h2 className="detail-modal-title">{selectedElon.name}</h2>
+
+                {selectedElon.text && (
+                  <div className="detail-modal-desc">
+                    <p>{selectedElon.text}</p>
+                  </div>
+                )}
+
+                {selectedElon.file && (
+                  <div className="detail-modal-actions">
+                    <a
+                      href={selectedElon.file}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="btn-primary"
+                      style={{ padding: "12px 28px", fontSize: 15, display: "inline-flex", alignItems: "center", gap: 8 }}
+                      download
+                    >
+                      <Paperclip size={16} />
+                      <span>{t.downloadAttachment || "Hujjatni yuklab olish"}</span>
+                      <Download size={16} />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

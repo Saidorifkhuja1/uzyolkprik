@@ -7,29 +7,23 @@ class UzbekClearableFileInput(ClearableFileInput):
 
 
 from .models import (
-    Announcement,
-    AnnouncementItem,
     CatalogItem,
     HomeCapability,
     HomeContent,
     HomeTask,
     Leader,
-    News,
     Page,
     SiteSettings,
     KorxonaUstavi,
     TashkiliyTuzilma,
     Ishlarimiz,
-    NarxNavo,
     NarxNavoProduct,
     ElonlarProduct,
     BoshIshOrinlariProduct,
-    BoshIshOrinlari,
     QaytaAloqa,
-    KatalogPage,
-    NomenklaturaPage,
-    FiliallarPage,
     FilialItem,
+    KatalogItem,
+    NomenklaturaItem,
 )
 
 
@@ -136,93 +130,219 @@ class BaseSinglePageAdmin(admin.ModelAdmin):
 
 
 @admin.register(KorxonaUstavi)
-class KorxonaUstaviAdmin(BaseSinglePageAdmin):
-    target_slug = "korxona-ustavi"
-
-
-@admin.register(TashkiliyTuzilma)
-class TashkiliyTuzilmaAdmin(BaseSinglePageAdmin):
-    target_slug = "tashkiliy-tuzilma"
-
-
-@admin.register(Ishlarimiz)
-class IshlarimizAdmin(BaseSinglePageAdmin):
-    target_slug = "ishlarimiz"
-
-
-
-
-class NarxNavoCatalogItemAdmin(admin.ModelAdmin):
-    """Narx-navo sahifasidagi mahsulotlar ro'yxati – alohida admin panel."""
-
-    list_display = ("title", "file_size", "order", "is_active", "created_at")
+class KorxonaUstaviAdmin(admin.ModelAdmin):
+    list_display = ("title", "order", "is_active", "has_image", "has_file")
     list_editable = ("order", "is_active")
-    list_filter = ("is_active",)
-    search_fields = ("title", "description")
+    fields = ("title", "content", "image", "file", "order", "is_active")
     ordering = ("order", "id")
-    list_per_page = 50
-    fieldsets = (
-        ("Asosiy ma'lumot", {
-            "fields": ("title", "description", "file_size", "order", "is_active")
-        }),
-        ("Fayl / Havola", {
-            "fields": ("file", "file_url", "embed_url"),
-            "description": "Faylni yuklang yoki tashqi havola kiriting."
-        }),
-    )
     formfield_overrides = {
         models.FileField: {'widget': UzbekClearableFileInput},
         models.ImageField: {'widget': UzbekClearableFileInput},
     }
 
-    # ── Narx-navo sahifasiga bog'liq elementlarni ko'rsatish ──────────────
-    def _get_narx_page(self):
-        return Page.objects.filter(slug="narx-navo").first()
+    def has_image(self, obj):
+        return bool(obj.image)
+    has_image.boolean = True
+    has_image.short_description = "Rasm"
+
+    def has_file(self, obj):
+        return bool(obj.file)
+    has_file.boolean = True
+    has_file.short_description = "Fayl"
 
     def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        narx_page = self._get_narx_page()
-        return qs.filter(page=narx_page) if narx_page else qs.none()
+        return super().get_queryset(request).filter(
+            models.Q(type="korxona-ustavi") | models.Q(slug__startswith="korxona-ustavi-")
+        ).exclude(slug="korxona-ustavi")
 
-    # ── Yangi mahsulotni avtomatik narx-navo sahifasiga bog'lash ──────────
     def save_model(self, request, obj, form, change):
-        if not change:
-            narx_page = self._get_narx_page()
-            if narx_page:
-                obj.page = narx_page
+        obj.type = "korxona-ustavi"
+        if not obj.slug or obj.slug == "korxona-ustavi":
+            from django.utils.text import slugify
+            base = slugify(obj.title) or "ustav"
+            candidate = f"korxona-ustavi-{base}"
+            counter = 1
+            qs = Page.objects.exclude(pk=obj.pk) if change else Page.objects.all()
+            while qs.filter(slug=candidate).exists():
+                candidate = f"korxona-ustavi-{base}-{counter}"
+                counter += 1
+            obj.slug = candidate
         super().save_model(request, obj, form, change)
 
-    # ── Har doim ro'yxatga qaytarish ──────────────────────────────────────
-    def _redirect_to_list(self):
-        from django.http import HttpResponseRedirect
-        from django.urls import reverse
-        return HttpResponseRedirect(reverse("admin:uzyol_catalogitem_changelist"))
+    def has_add_permission(self, request):
+        return True
 
-    def response_add(self, request, obj, post_url_continue=None):
-        # "Saqlash va yangisini qo'shish" tugmasi bundan mustasno
-        if "_addanother" in request.POST:
-            from django.contrib import messages
-            messages.success(request, f'"{obj.title}" qo\'shildi.')
-            from django.http import HttpResponseRedirect
-            from django.urls import reverse
-            return HttpResponseRedirect(reverse("admin:uzyol_catalogitem_add"))
-        return self._redirect_to_list()
-
-    def response_change(self, request, obj):
-        if "_addanother" in request.POST:
-            from django.http import HttpResponseRedirect
-            from django.urls import reverse
-            return HttpResponseRedirect(reverse("admin:uzyol_catalogitem_add"))
-        if "_continue" in request.POST:
-            from django.http import HttpResponseRedirect
-            from django.urls import reverse
-            return HttpResponseRedirect(
-                reverse("admin:uzyol_catalogitem_change", args=[obj.pk])
-            )
-        return self._redirect_to_list()
+    def has_delete_permission(self, request, obj=None):
+        return True
 
 
-admin.site.register(CatalogItem, NarxNavoCatalogItemAdmin)
+@admin.register(TashkiliyTuzilma)
+class TashkiliyTuzilmaAdmin(admin.ModelAdmin):
+    list_display = ("title", "order", "is_active", "has_image", "has_file")
+    list_editable = ("order", "is_active")
+    fields = ("title", "content", "image", "file", "order", "is_active")
+    ordering = ("order", "id")
+    formfield_overrides = {
+        models.FileField: {'widget': UzbekClearableFileInput},
+        models.ImageField: {'widget': UzbekClearableFileInput},
+    }
+
+    def has_image(self, obj):
+        return bool(obj.image)
+    has_image.boolean = True
+    has_image.short_description = "Rasm"
+
+    def has_file(self, obj):
+        return bool(obj.file)
+    has_file.boolean = True
+    has_file.short_description = "Fayl"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(
+            models.Q(type="tashkiliy-tuzilma") | models.Q(slug__startswith="tashkiliy-tuzilma-")
+        ).exclude(slug="tashkiliy-tuzilma")
+
+    def save_model(self, request, obj, form, change):
+        obj.type = "tashkiliy-tuzilma"
+        if not obj.slug or (obj.slug == "tashkiliy-tuzilma" and not change):
+            from django.utils.text import slugify
+            base = slugify(obj.title) or "bolim"
+            if not Page.objects.filter(slug="tashkiliy-tuzilma").exists() and not change:
+                obj.slug = "tashkiliy-tuzilma"
+            else:
+                candidate = f"tashkiliy-tuzilma-{base}"
+                counter = 1
+                qs = Page.objects.all()
+                if change:
+                    qs = qs.exclude(pk=obj.pk)
+                while qs.filter(slug=candidate).exists():
+                    candidate = f"tashkiliy-tuzilma-{base}-{counter}"
+                    counter += 1
+                obj.slug = candidate
+        super().save_model(request, obj, form, change)
+
+    def has_add_permission(self, request):
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return True
+
+
+@admin.register(Ishlarimiz)
+class IshlarimizAdmin(admin.ModelAdmin):
+    list_display = ("title", "order", "is_active", "has_image", "has_file")
+    list_editable = ("order", "is_active")
+    fields = ("title", "content", "image", "file", "order", "is_active")
+    ordering = ("order", "id")
+    formfield_overrides = {
+        models.FileField: {'widget': UzbekClearableFileInput},
+        models.ImageField: {'widget': UzbekClearableFileInput},
+    }
+
+    def has_image(self, obj):
+        return bool(obj.image)
+    has_image.boolean = True
+    has_image.short_description = "Rasm"
+
+    def has_file(self, obj):
+        return bool(obj.file)
+    has_file.boolean = True
+    has_file.short_description = "Fayl"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(
+            models.Q(type="ishlarimiz") | models.Q(slug__startswith="ishlarimiz-")
+        ).exclude(slug="ishlarimiz")
+
+    def save_model(self, request, obj, form, change):
+        obj.type = "ishlarimiz"
+        if not obj.slug or obj.slug == "ishlarimiz":
+            from django.utils.text import slugify
+            base = slugify(obj.title) or "ish"
+            candidate = f"ishlarimiz-{base}"
+            counter = 1
+            qs = Page.objects.all()
+            if change:
+                qs = qs.exclude(pk=obj.pk)
+            while qs.filter(slug=candidate).exists():
+                candidate = f"ishlarimiz-{base}-{counter}"
+                counter += 1
+            obj.slug = candidate
+        super().save_model(request, obj, form, change)
+
+    def has_add_permission(self, request):
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return True
+
+
+
+
+@admin.register(KatalogItem)
+class KatalogItemAdmin(admin.ModelAdmin):
+    list_display = ("title", "order", "is_active", "has_image", "has_file", "created_at")
+    list_editable = ("order", "is_active")
+    fields = ("title", "description", "file", "image", "order", "is_active")
+    ordering = ("order", "id")
+    formfield_overrides = {
+        models.FileField: {'widget': UzbekClearableFileInput},
+        models.ImageField: {'widget': UzbekClearableFileInput},
+    }
+
+    def has_image(self, obj):
+        return bool(obj.image)
+    has_image.boolean = True
+    has_image.short_description = "Rasm"
+
+    def has_file(self, obj):
+        return bool(obj.file or obj.file_url)
+    has_file.boolean = True
+    has_file.short_description = "Fayl"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(page__slug="katalog")
+
+    def save_model(self, request, obj, form, change):
+        if not obj.page_id:
+            obj.page = Page.objects.filter(slug="katalog").first()
+        super().save_model(request, obj, form, change)
+
+    def has_add_permission(self, request):
+        return True
+
+
+@admin.register(NomenklaturaItem)
+class NomenklaturaItemAdmin(admin.ModelAdmin):
+    list_display = ("title", "order", "is_active", "has_image", "has_file", "created_at")
+    list_editable = ("order", "is_active")
+    fields = ("title", "description", "file", "image", "order", "is_active")
+    ordering = ("order", "id")
+    formfield_overrides = {
+        models.FileField: {'widget': UzbekClearableFileInput},
+        models.ImageField: {'widget': UzbekClearableFileInput},
+    }
+
+    def has_image(self, obj):
+        return bool(obj.image)
+    has_image.boolean = True
+    has_image.short_description = "Rasm"
+
+    def has_file(self, obj):
+        return bool(obj.file or obj.file_url)
+    has_file.boolean = True
+    has_file.short_description = "Fayl"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(page__slug="nomenklatura")
+
+    def save_model(self, request, obj, form, change):
+        if not obj.page_id:
+            obj.page = Page.objects.filter(slug="nomenklatura").first()
+        super().save_model(request, obj, form, change)
+
+    def has_add_permission(self, request):
+        return True
 
 
 @admin.register(NarxNavoProduct)
@@ -244,18 +364,9 @@ class NarxNavoProductAdmin(admin.ModelAdmin):
     }
 
 
-
-@admin.register(BoshIshOrinlari)
-class BoshIshOrinlariAdmin(BaseSinglePageAdmin):
-    target_slug = "bosh-ish-orinlari"
-
-
 @admin.register(QaytaAloqa)
 class QaytaAloqaAdmin(BaseSinglePageAdmin):
     target_slug = "qayta-aloqa"
-
-
-
 
 
 @admin.register(Leader)
@@ -269,23 +380,6 @@ class LeaderAdmin(admin.ModelAdmin):
         models.FileField: {'widget': UzbekClearableFileInput},
         models.ImageField: {'widget': UzbekClearableFileInput},
     }
-
-
-class AnnouncementItemInline(admin.TabularInline):
-    model = AnnouncementItem
-    extra = 1
-    fields = ("text", "order")
-
-
-@admin.register(Announcement)
-class AnnouncementAdmin(admin.ModelAdmin):
-    inlines = (AnnouncementItemInline,)
-    list_display = ("page", "email", "is_active")
-    list_filter = ("is_active",)
-    search_fields = ("page__title", "intro", "email")
-
-
-# News admini o'chirildi (foydalanuvchi so'rovi bilan)
 
 
 def _make_product_admin(fieldset_title="Asosiy ma'lumot"):
@@ -317,21 +411,6 @@ class ElonlarProductAdmin(_make_product_admin("Faoliyatimiz ma'lumotlari")):
 @admin.register(BoshIshOrinlariProduct)
 class BoshIshOrinlariProductAdmin(_make_product_admin("Ish o'rni ma'lumotlari")):
     pass
-
-
-@admin.register(KatalogPage)
-class KatalogPageAdmin(BaseSinglePageAdmin):
-    target_slug = "katalog"
-
-
-@admin.register(NomenklaturaPage)
-class NomenklaturaPageAdmin(BaseSinglePageAdmin):
-    target_slug = "nomenklatura"
-
-
-@admin.register(FiliallarPage)
-class FiliallarPageAdmin(BaseSinglePageAdmin):
-    target_slug = "filiallar"
 
 
 @admin.register(FilialItem)
@@ -374,7 +453,7 @@ class FilialItemAdmin(admin.ModelAdmin):
     director_image_preview.short_description = "Direktor rasmi"
 
 
-# Monkey patch: sidebar tartibini sozlash va narx-navo nomini o'zgartirish
+# Monkey patch: sidebar tartibini sozlash va nomlarni moslashtirish
 original_get_app_list = admin.site.get_app_list
 
 def get_app_list(request, app_label=None):
@@ -382,18 +461,18 @@ def get_app_list(request, app_label=None):
 
     model_order = [
         "homecontent",
+        "sitesettings",
         "korxonaustavi",
         "tashkiliytuzilma",
+        "ishlarimiz",
         "leader",
-        "katalogpage",
-        "nomenklaturapage",
-        "narxnavoproduct",     # Narx-navo
-        "boshishorinlari",
-        "filialitem",          # Filiallar
+        "katalogitem",
+        "nomenklaturaitem",
+        "narxnavoproduct",
+        "elonlarproduct",
+        "boshishorinlariproduct",
+        "filialitem",
         "qaytaaloqa",
-        "announcement",
-        "news",
-        "sitesettings",
     ]
 
     for app in app_list:
@@ -404,14 +483,36 @@ def get_app_list(request, app_label=None):
         for model in app['models']:
             obj_name = model.get('object_name', '').lower()
 
-            # narxnavo, catalogitem va filiallarpage ni sidebardan yashirish
-            if obj_name in ('narxnavo', 'catalogitem', 'filiallarpage'):
+            # Yashiriladigan modellar
+            if obj_name in (
+                'narxnavo',
+                'catalogitem',
+                'filiallarpage',
+                'katalogpage',
+                'nomenklaturapage',
+                'boshishorinlari',
+                'announcement',
+                'announcementitem',
+                'news',
+            ):
                 continue
 
-            # narxnavoproduct → Narx-navo
+            # Nomlarni chiroyli ko'rsatish
             if obj_name == 'narxnavoproduct':
                 model = dict(model)
                 model['name'] = 'Narx-navo'
+            elif obj_name == 'elonlarproduct':
+                model = dict(model)
+                model['name'] = 'Faoliyatimiz'
+            elif obj_name == 'boshishorinlariproduct':
+                model = dict(model)
+                model['name'] = "Bo'sh ish o'rinlari"
+            elif obj_name == 'katalogitem':
+                model = dict(model)
+                model['name'] = 'Katalog'
+            elif obj_name == 'nomenklaturaitem':
+                model = dict(model)
+                model['name'] = 'Nomenklatura'
 
             cleaned.append(model)
 

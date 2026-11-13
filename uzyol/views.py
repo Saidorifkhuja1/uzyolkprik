@@ -1,3 +1,4 @@
+from django.db import models
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -150,6 +151,7 @@ _serialize_vacancy = _serialize_product
 def _serialize_catalog_item(item):
     f_url = item.get_download_url()
     emb_url = item.get_embed_url()
+    img_url = item.image.url if getattr(item, "image", None) and item.image else None
     return {
         "id": item.id,
         "pageSlug": item.page.slug if item.page else None,
@@ -158,6 +160,7 @@ def _serialize_catalog_item(item):
         "fileUrl": f_url,
         "file": f_url,
         "embedUrl": emb_url,
+        "imageUrl": img_url,
         "fileSize": item.file_size or "",
         "order": item.order,
         "is_active": item.is_active,
@@ -260,6 +263,7 @@ def _catalog_items_payload(page):
             "title": item.title,
             "fileUrl": item.get_download_url(),
             "embedUrl": item.get_embed_url(),
+            "imageUrl": item.image.url if getattr(item, "image", None) and item.image else None,
             "description": item.description,
             "fileSize": item.file_size,
         })
@@ -314,6 +318,84 @@ def _page_payload(page):
         vacancies = BoshIshOrinlariProduct.objects.filter(is_active=True).order_by("order", "id")
         payload["vacancies"] = [_serialize_vacancy(v) for v in vacancies]
 
+    # Ishlarimiz ro'yxati
+    if page.slug == "ishlarimiz":
+        payload["title"] = page.title or "Ishlarimiz"
+        payload["content"] = page.content or "Oʻzyoʻlkoʻprik klasteri tomonidan amalga oshirilgan va davom etayotgan asosiy koʻprik hamda sunʼiy inshootlar loyihalari"
+        ishlar_qs = Page.objects.filter(
+            models.Q(type="ishlarimiz") | models.Q(slug__startswith="ishlarimiz-")
+        ).exclude(slug="ishlarimiz").filter(is_active=True).order_by("order", "id")
+
+        extra_items = []
+        for item in ishlar_qs:
+            file_url = item.file.url if item.file else None
+            img_url = item.image.url if item.image else None
+            extra_items.append({
+                "id": item.id,
+                "title": item.title,
+                "description": item.content,
+                "fileUrl": file_url,
+                "embedUrl": img_url,
+                "imageUrl": img_url,
+                "order": item.order,
+            })
+        cat_items = _catalog_items_payload(page)
+        if cat_items:
+            extra_items.extend(cat_items)
+        extra_items.sort(key=lambda x: (x.get("order", 0), x.get("id", 0)))
+        payload["catalogItems"] = extra_items
+
+    # Tashkiliy tuzilma ro'yxati
+    if page.slug == "tashkiliy-tuzilma":
+        tuzilma_qs = Page.objects.filter(
+            models.Q(type="tashkiliy-tuzilma") | models.Q(slug__startswith="tashkiliy-tuzilma-")
+        ).exclude(slug="tashkiliy-tuzilma").filter(is_active=True).order_by("order", "id")
+
+        extra_items = []
+        for item in tuzilma_qs:
+            file_url = item.file.url if item.file else None
+            img_url = item.image.url if item.image else None
+            extra_items.append({
+                "id": item.id,
+                "title": item.title,
+                "description": item.content,
+                "fileUrl": file_url,
+                "embedUrl": img_url,
+                "imageUrl": img_url,
+                "order": item.order,
+            })
+        cat_items = _catalog_items_payload(page)
+        if cat_items:
+            extra_items.extend(cat_items)
+        extra_items.sort(key=lambda x: (x.get("order", 0), x.get("id", 0)))
+        payload["catalogItems"] = extra_items
+
+    # Korxona ustavi ro'yxati
+    if page.slug == "korxona-ustavi":
+        ustav_qs = Page.objects.filter(
+            models.Q(type="korxona-ustavi") | models.Q(slug__startswith="korxona-ustavi-")
+        ).exclude(slug="korxona-ustavi").filter(is_active=True).order_by("order", "id")
+
+        extra_items = []
+        for item in ustav_qs:
+            file_url = item.file.url if item.file else None
+            img_url = item.image.url if item.image else None
+            extra_items.append({
+                "id": item.id,
+                "title": item.title,
+                "description": item.content,
+                "fileUrl": file_url,
+                "embedUrl": img_url,
+                "imageUrl": img_url,
+                "order": item.order,
+            })
+        cat_items = _catalog_items_payload(page)
+        if cat_items:
+            extra_items.extend(cat_items)
+        if extra_items:
+            extra_items.sort(key=lambda x: (x.get("order", 0), x.get("id", 0)))
+            payload["catalogItems"] = extra_items
+
     return payload
 
 
@@ -323,8 +405,34 @@ def _get_payload():
     if settings is None:
         return None
 
+    standard_slugs = (
+        ("bosh-sahifa", "Bosh sahifa", "home"),
+        ("korxona-ustavi", "Korxona ustavi", "korxona-ustavi"),
+        ("tashkiliy-tuzilma", "Tashkiliy tuzilma", "tashkiliy-tuzilma"),
+        ("ishlarimiz", "Ishlarimiz", "ishlarimiz"),
+        ("rahbariyat", "Rahbariyat", "leaders"),
+        ("katalog", "Katalog", "document"),
+        ("nomenklatura", "Nomenklatura", "document"),
+        ("narx-navo", "Narx-navo", "status"),
+        ("bosh-ish-orinlari", "Boʻsh ish oʻrinlari", "status"),
+        ("filiallar", "Filiallar", "filiallar"),
+        ("elonlar", "Eʼlonlar", "announcement"),
+        ("qayta-aloqa", "Qayta aloqa", "contact"),
+    )
+    for s_slug, s_title, s_type in standard_slugs:
+        Page.objects.get_or_create(
+            slug=s_slug,
+            defaults={"title": s_title, "type": s_type, "is_active": True}
+        )
+
     payload = _settings_payload(settings)
-    pages = [_page_payload(page) for page in Page.objects.filter(is_active=True)]
+    pages = [
+        _page_payload(page)
+        for page in Page.objects.filter(is_active=True)
+        .exclude(slug__startswith="ishlarimiz-")
+        .exclude(slug__startswith="tashkiliy-tuzilma-")
+        .exclude(slug__startswith="korxona-ustavi-")
+    ]
     payload.update(
         {
             "navigation": _navigation_payload(),
@@ -374,26 +482,7 @@ def pages(_request):
 def _check_page_permission(user, slug):
     if not user or not user.is_authenticated:
         return False
-    if user.is_superuser:
-        return True
-    profile = getattr(user, "admin_profile", None)
-    if not profile:
-        return False
-
-    slug_perm_map = {
-        "korxona-ustavi": profile.can_edit_korxona_ustavi,
-        "tashkiliy-tuzilma": profile.can_edit_tashkiliy_tuzilma,
-        "ishlarimiz": profile.can_edit_ishlarimiz,
-        "katalog": profile.can_edit_katalog,
-        "nomenklatura": profile.can_edit_nomenklatura,
-        "narx-navo": profile.can_edit_narx_navo,
-        "bosh-ish-orinlari": profile.can_edit_vacancies,
-        "filiallar": profile.can_edit_filiallar,
-        "qayta-aloqa": profile.can_edit_contact,
-        "elonlar": profile.can_edit_elonlar or profile.can_edit_announcements,
-        "rahbariyat": profile.can_edit_leaders,
-    }
-    return bool(slug_perm_map.get(slug, False))
+    return bool(user.is_superuser)
 
 
 @swagger_auto_schema(
@@ -412,7 +501,10 @@ def page_detail(request, slug):
     try:
         page = Page.objects.get(slug=slug, is_active=True)
     except Page.DoesNotExist:
-        return Response({"detail": "Sahifa topilmadi"}, status=status.HTTP_404_NOT_FOUND)
+        if slug in ("korxona-ustavi", "tashkiliy-tuzilma", "ishlarimiz", "katalog", "nomenklatura", "rahbariyat", "filiallar", "bosh-ish-orinlari", "narx-navo", "qayta-aloqa"):
+            page, _ = Page.objects.get_or_create(slug=slug, defaults={"title": slug.replace("-", " ").title(), "is_active": True})
+        else:
+            return Response({"detail": "Sahifa topilmadi"}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == "GET":
         return Response(_page_payload(page))
@@ -969,23 +1061,56 @@ def vacancies_detail_update_delete(request, pk):
 @api_view(["GET", "POST"])
 def catalog_items_list_create(request):
     slug = request.query_params.get("slug") or request.data.get("page_slug", "katalog")
-    perm_name = "can_edit_nomenklatura" if slug == "nomenklatura" else "can_edit_katalog"
+    if slug == "nomenklatura":
+        perm_name = "can_edit_nomenklatura"
+    elif slug == "ishlarimiz":
+        perm_name = "can_edit_ishlarimiz"
+    elif slug == "tashkiliy-tuzilma":
+        perm_name = "can_edit_tashkiliy_tuzilma"
+    elif slug == "korxona-ustavi":
+        perm_name = "can_edit_korxona_ustavi"
+    else:
+        perm_name = "can_edit_katalog"
     can_manage = _check_perm(request.user, perm_name)
 
     if request.method == "GET":
+        if slug in ("ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi"):
+            prefix = slug
+            qs = Page.objects.filter(
+                models.Q(type=prefix) | models.Q(slug__startswith=f"{prefix}-")
+            ).exclude(slug=prefix)
+            if not can_manage:
+                qs = qs.filter(is_active=True)
+            results = []
+            for p in qs.order_by("order", "id"):
+                results.append({
+                    "id": p.id,
+                    "title": p.title,
+                    "description": p.content,
+                    "imageUrl": p.image.url if p.image else None,
+                    "embedUrl": p.image.url if p.image else None,
+                    "fileUrl": p.file.url if p.file else None,
+                    "order": p.order,
+                    "is_active": p.is_active,
+                })
+            cat_qs = CatalogItem.objects.filter(page__slug=slug)
+            if not can_manage:
+                cat_qs = cat_qs.filter(is_active=True)
+            results.extend([_serialize_catalog_item(item) for item in cat_qs.order_by("order", "id")])
+            results.sort(key=lambda x: (x.get("order", 0), x.get("id", 0)))
+            return Response({"results": results})
+
         qs = CatalogItem.objects.filter(page__slug=slug) if slug else CatalogItem.objects.all()
         if not can_manage:
             qs = qs.filter(is_active=True)
         return Response({"results": [_serialize_catalog_item(item) for item in qs.order_by("order", "id")]})
 
     if not can_manage:
-        return Response({"detail": "Sizda hujjat qo'shish huquqi mavjud emas."}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "Sizda ma'lumot qo'shish huquqi mavjud emas."}, status=status.HTTP_403_FORBIDDEN)
 
     title = request.data.get("title", "").strip()
     if not title:
-        return Response({"detail": "Hujjat nomi kiritilishi shart."}, status=status.HTTP_400_BAD_REQUEST)
-
-    page_obj = Page.objects.filter(slug=slug).first()
+        return Response({"detail": "Nomi kiritilishi shart."}, status=status.HTTP_400_BAD_REQUEST)
 
     order = request.data.get("order", 0)
     try:
@@ -993,10 +1118,42 @@ def catalog_items_list_create(request):
     except (ValueError, TypeError):
         order = 0
 
+    if slug in ("ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi"):
+        from django.utils.text import slugify
+        base = slugify(title) or ("ish" if slug == "ishlarimiz" else ("bolim" if slug == "tashkiliy-tuzilma" else "ustav"))
+        candidate = f"{slug}-{base}"
+        counter = 1
+        while Page.objects.filter(slug=candidate).exists():
+            candidate = f"{slug}-{base}-{counter}"
+            counter += 1
+        page_item = Page.objects.create(
+            title=title,
+            content=request.data.get("description", "").strip(),
+            type=slug,
+            slug=candidate,
+            image=request.FILES.get("image"),
+            file=request.FILES.get("file"),
+            order=order,
+            is_active=request.data.get("is_active", "true") in ("true", "1", True, "True"),
+        )
+        return Response({
+            "id": page_item.id,
+            "title": page_item.title,
+            "description": page_item.content,
+            "imageUrl": page_item.image.url if page_item.image else None,
+            "embedUrl": page_item.image.url if page_item.image else None,
+            "fileUrl": page_item.file.url if page_item.file else None,
+            "order": page_item.order,
+            "is_active": page_item.is_active,
+        }, status=status.HTTP_201_CREATED)
+
+    page_obj = Page.objects.filter(slug=slug).first()
+
     item = CatalogItem.objects.create(
         page=page_obj,
         title=title,
         description=request.data.get("description", "").strip(),
+        image=request.FILES.get("image"),
         file=request.FILES.get("file"),
         file_url=request.data.get("file_url", "").strip(),
         order=order,
@@ -1007,53 +1164,98 @@ def catalog_items_list_create(request):
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
 def catalog_item_detail_update_delete(request, pk):
-    try:
-        item = CatalogItem.objects.get(pk=pk)
-    except CatalogItem.DoesNotExist:
-        return Response({"detail": "Hujjat topilmadi."}, status=status.HTTP_404_NOT_FOUND)
+    item = CatalogItem.objects.filter(pk=pk).first()
+    page_item = None
+    if not item:
+        page_item = Page.objects.filter(pk=pk).first()
+        if not page_item:
+            return Response({"detail": "Ma'lumot topilmadi."}, status=status.HTTP_404_NOT_FOUND)
 
-    slug = item.page.slug if item.page else "katalog"
-    perm_name = "can_edit_nomenklatura" if slug == "nomenklatura" else "can_edit_katalog"
+    raw_slug = item.page.slug if (item and item.page) else (page_item.slug if page_item else "katalog")
+    if raw_slug == "nomenklatura":
+        perm_name = "can_edit_nomenklatura"
+    elif "ishlarimiz" in raw_slug:
+        perm_name = "can_edit_ishlarimiz"
+    elif "tashkiliy-tuzilma" in raw_slug:
+        perm_name = "can_edit_tashkiliy_tuzilma"
+    elif "korxona-ustavi" in raw_slug:
+        perm_name = "can_edit_korxona_ustavi"
+    else:
+        perm_name = "can_edit_katalog"
     can_manage = _check_perm(request.user, perm_name)
 
     if request.method == "GET":
-        return Response(_serialize_catalog_item(item))
+        if item:
+            return Response(_serialize_catalog_item(item))
+        return Response({
+            "id": page_item.id,
+            "title": page_item.title,
+            "description": page_item.content,
+            "fileUrl": page_item.file.url if page_item.file else None,
+            "imageUrl": page_item.image.url if page_item.image else None,
+            "order": page_item.order,
+            "is_active": page_item.is_active,
+        })
 
     if not can_manage:
-        return Response({"detail": "Sizda ushbu hujjatni o'zgartirish yoki o'chirish huquqi mavjud emas."}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"detail": "Sizda ushbu elementni o'zgartirish yoki o'chirish huquqi mavjud emas."}, status=status.HTTP_403_FORBIDDEN)
 
     if request.method == "DELETE":
-        item.delete()
-        return Response({"detail": "Hujjat muvaffaqiyatli o'chirildi.", "id": pk})
+        if page_item and page_item.slug in ("ishlarimiz", "tashkiliy-tuzilma", "korxona-ustavi"):
+            return Response({"detail": "Asosiy sahifani o'chirib bo'lmaydi."}, status=status.HTTP_400_BAD_REQUEST)
+        if item:
+            item.delete()
+        elif page_item:
+            page_item.delete()
+        return Response({"detail": "Muvaffaqiyatli o'chirildi.", "id": pk})
 
-    if "title" in request.data:
-        title = request.data.get("title", "").strip()
-        if not title:
-            return Response({"detail": "Hujjat nomi bo'sh bo'lishi mumkin emas."}, status=status.HTTP_400_BAD_REQUEST)
-        item.title = title
+    # PUT / PATCH
+    target = item or page_item
+    title = request.data.get("title", "").strip()
+    if title:
+        target.title = title
 
+    desc = request.data.get("description", "")
     if "description" in request.data:
-        item.description = request.data.get("description", "").strip()
+        if item:
+            target.description = desc.strip()
+        else:
+            target.content = desc.strip()
 
     if "order" in request.data:
         try:
-            item.order = int(request.data.get("order", 0))
+            target.order = int(request.data.get("order", 0))
         except (ValueError, TypeError):
             pass
 
     if "is_active" in request.data:
-        item.is_active = request.data.get("is_active") in ("true", "1", True, "True")
+        target.is_active = request.data.get("is_active") in ("true", "1", True, "True")
+
+    if "image" in request.FILES:
+        target.image = request.FILES.get("image")
+    elif request.data.get("remove_image") in ("true", "1", True):
+        target.image = None
 
     if "file" in request.FILES:
-        item.file = request.FILES.get("file")
+        target.file = request.FILES.get("file")
     elif request.data.get("remove_file") in ("true", "1", True):
-        item.file = None
+        target.file = None
 
-    if "file_url" in request.data:
-        item.file_url = request.data.get("file_url", "").strip()
+    if item and "file_url" in request.data:
+        target.file_url = request.data.get("file_url", "").strip()
 
-    item.save()
-    return Response(_serialize_catalog_item(item))
+    target.save()
+    if item:
+        return Response(_serialize_catalog_item(item))
+    return Response({
+        "id": target.id,
+        "title": target.title,
+        "description": target.content,
+        "fileUrl": target.file.url if target.file else None,
+        "imageUrl": target.image.url if target.image else None,
+        "order": target.order,
+        "is_active": target.is_active,
+    })
 
 
 # ─────────────────────────────────────────────────────────────

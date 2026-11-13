@@ -144,6 +144,9 @@ class Page(models.Model):
     CONTACT = "contact"
 
     FILIALLAR = "filiallar"
+    ISHLARIMIZ = "ishlarimiz"
+    TASHKILIY_TUZILMA = "tashkiliy-tuzilma"
+    KORXONA_USTAVI = "korxona-ustavi"
 
     PAGE_TYPES = (
         (HOME, "Bosh sahifa"),
@@ -154,6 +157,9 @@ class Page(models.Model):
         (ANNOUNCEMENT, "Eʼlon"),
         (CONTACT, "Qayta aloqa"),
         (FILIALLAR, "Filiallar"),
+        (ISHLARIMIZ, "Ishlarimiz"),
+        (TASHKILIY_TUZILMA, "Tashkiliy tuzilma"),
+        (KORXONA_USTAVI, "Korxona ustavi"),
     )
 
     slug = models.SlugField(max_length=128, blank=True, unique=True, verbose_name="Slug (URL manzili)")
@@ -240,11 +246,13 @@ class AnnouncementItem(models.Model):
 
 class News(models.Model):
     title = models.CharField(max_length=255, verbose_name="Yangilik sarlavhasi")
-    slug = models.SlugField(max_length=128, unique=True, verbose_name="Slug (URL manzili)")
+    slug = models.SlugField(max_length=128, blank=True, unique=True, verbose_name="Slug (URL manzili)")
     summary = models.TextField(blank=True, verbose_name="Qisqacha mazmuni")
     body = models.TextField(verbose_name="Batafsil matn")
+    image = models.ImageField(upload_to="news/images/", blank=True, null=True, verbose_name="Rasm yuklash (Image)")
+    file = models.FileField(upload_to="news/files/", blank=True, null=True, verbose_name="Fayl yuklash (File)")
     image_url = models.URLField(max_length=2000, blank=True, verbose_name="Rasm havolasi")
-    published_at = models.DateTimeField(verbose_name="Nashr qilingan vaqti")
+    published_at = models.DateTimeField(blank=True, null=True, verbose_name="Nashr qilingan vaqti")
     is_active = models.BooleanField(default=True, verbose_name="Faol")
 
     class Meta:
@@ -254,6 +262,22 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.title)
+            if not self.slug:
+                self.slug = f"yangilik-{self.id or ''}"
+        if not self.published_at:
+            from django.utils import timezone
+            self.published_at = timezone.now()
+        super().save(*args, **kwargs)
+
+    def get_image_url(self):
+        if self.image:
+            return self.image.url
+        return self.image_url
 
 
 class CatalogItem(models.Model):
@@ -266,6 +290,7 @@ class CatalogItem(models.Model):
         verbose_name="Sahifa",
     )
     title = models.CharField(max_length=255, default="Каталог ver. 2.pdf", verbose_name="Hujjat nomi")
+    image = models.ImageField(upload_to="catalogs/images/", blank=True, null=True, verbose_name="Rasm yuklash (Image)")
     file = models.FileField(upload_to="catalogs/", blank=True, null=True, verbose_name="Hujjat fayli")
     file_url = models.URLField(max_length=2000, blank=True, verbose_name="Hujjat havolasi (Google Drive va h.k.)")
     embed_url = models.URLField(max_length=2000, blank=True, verbose_name="Koʻrish havolasi (Embed URL)")
@@ -443,4 +468,18 @@ class FiliallarPage(Page):
         proxy = True
         verbose_name = "Filiallar"
         verbose_name_plural = "Filiallar"
+
+
+class KatalogItem(CatalogItem):
+    class Meta:
+        proxy = True
+        verbose_name = "Katalog hujjati"
+        verbose_name_plural = "Katalog"
+
+
+class NomenklaturaItem(CatalogItem):
+    class Meta:
+        proxy = True
+        verbose_name = "Nomenklatura hujjati"
+        verbose_name_plural = "Nomenklatura"
 
