@@ -447,7 +447,6 @@ class ContactItem(models.Model):
         ("phone", "Telefon (Phone)"),
         ("email", "E-pochta (Email)"),
         ("clock", "Ish vaqti (Work Hours)"),
-        ("bank", "Hisob-raqam / Bank rekvizitlari"),
         ("address", "Joylashuv manzili (Address)"),
         ("map", "Joylashuv xaritasi (Google Map)"),
         ("info", "Boshqa ma'lumot (General Info)"),
@@ -456,7 +455,7 @@ class ContactItem(models.Model):
     title = models.CharField(
         max_length=128,
         verbose_name="Element nomi / Sarlavhasi",
-        help_text="Masalan: Telefon raqamlar, E-pochtamiz, Ish vaqti, Hisob-raqam, Joylashuv manzili, Joylashuv xaritasi...",
+        help_text="Masalan: Telefon raqamlar, E-pochtamiz, Ish vaqti, Joylashuv manzili, Joylashuv xaritasi...",
     )
     value = models.TextField(
         verbose_name="Qiymati / Ma'lumot matni",

@@ -394,7 +394,6 @@ class ContactItemAdmin(admin.ModelAdmin):
             "phone": ("Telefon", "#0ea5e9"),
             "email": ("E-pochta", "#10b981"),
             "clock": ("Ish vaqti", "#f59e0b"),
-            "bank": ("Hisob-raqam", "#8b5cf6"),
             "address": ("Joylashuv manzili", "#ec4899"),
             "map": ("Xarita", "#06b6d4"),
             "info": ("Boshqa", "#64748b"),
@@ -406,6 +405,36 @@ class ContactItemAdmin(admin.ModelAdmin):
             text,
         )
     icon_badge.short_description = "Turi"
+
+    def has_module_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        prof = getattr(request.user, "admin_profile", None)
+        return bool(prof and prof.can_edit_contact)
+
+    def has_view_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        prof = getattr(request.user, "admin_profile", None)
+        return bool(prof and prof.can_edit_contact)
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        prof = getattr(request.user, "admin_profile", None)
+        return bool(prof and prof.can_edit_contact)
+
+    def has_add_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        prof = getattr(request.user, "admin_profile", None)
+        return bool(prof and prof.can_edit_contact)
+
+    def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        prof = getattr(request.user, "admin_profile", None)
+        return bool(prof and prof.can_edit_contact)
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
@@ -421,8 +450,6 @@ class ContactItemAdmin(admin.ModelAdmin):
                     s.phone_secondary = lines[1]
             elif obj.icon == "clock":
                 s.hours = obj.value.strip()
-            elif obj.icon == "bank":
-                s.bank = obj.value.strip()
             elif obj.icon == "address":
                 s.address = obj.value.strip()
             elif obj.icon == "map":

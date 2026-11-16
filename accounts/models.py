@@ -108,7 +108,7 @@ class AdminProfile(models.Model):
             "can_edit_narx_navo": ["narxnavoproduct"],
             "can_edit_vacancies": ["boshishorinlari", "boshishorinlariproduct"],
             "can_edit_filiallar": ["filiallarpage", "filialitem"],
-            "can_edit_contact": ["qaytaaloqa"],
+            "can_edit_contact": ["qaytaaloqa", "contactitem"],
             "can_edit_elonlar": ["elonlarproduct"],
         }
 

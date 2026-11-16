@@ -1574,29 +1574,6 @@ function Header({
 
   return (
     <header className="site-header">
-      <div className="top-strip">
-        <div className="top-strip-info">
-          <span className="top-strip-item">
-            <Building2 size={14} />
-            {t.brandLegalName || site.brand.legalName}
-          </span>
-          {(site.contact?.hours || t.contactHours) && (
-            <span className="top-strip-item">
-              <Clock3 size={14} />
-              {site.contact?.hours || t.contactHours}
-            </span>
-          )}
-        </div>
-        <div className="top-strip-info">
-          {site.contact?.email && (
-            <a href={`mailto:${site.contact.email}`} className="top-strip-item">
-              <Mail size={14} />
-              {site.contact.email}
-            </a>
-          )}
-        </div>
-      </div>
-
       <div className="nav-wrap">
         <button className="brand-button" onClick={() => onNavigate("bosh-sahifa")}>
           <img
@@ -4711,7 +4688,6 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
   const [phone2, setPhone2] = useState(contact.phones?.[1] || contact.phone_secondary || "");
   const [email, setEmail] = useState(contact.email || "");
   const [hours, setHours] = useState(contact.hours || "");
-  const [bank, setBank] = useState(contact.bank || "");
   const [address, setAddress] = useState(contact.address || "");
   const [mapUrl, setMapUrl] = useState(contact.map || contact.map_url || "");
   const [saving, setSaving] = useState(false);
@@ -4722,7 +4698,6 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
     setPhone2(contact.phones?.[1] || contact.phone_secondary || "");
     setEmail(contact.email || "");
     setHours(contact.hours || "");
-    setBank(contact.bank || "");
     setAddress(contact.address || "");
     setMapUrl(contact.map || contact.map_url || "");
   }, [contact]);
@@ -4739,7 +4714,6 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
         phone_secondary: phone2.trim(),
         email: email.trim(),
         hours: hours.trim(),
-        bank: bank.trim(),
         address: address.trim(),
         map: mapUrl.trim(),
       });
@@ -4831,17 +4805,6 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
           </div>
 
           <div className="elon-form-group">
-            <label>Bank rekvizitlari</label>
-            <textarea
-              value={bank}
-              onChange={(e) => setBank(e.target.value)}
-              rows={3}
-              className="elon-form-textarea"
-              placeholder="Oʻzbekiston Respublikasi TIF Milliy bank Bektemir tumani filiali BIK 00450 STIR 200 836 188"
-            />
-          </div>
-
-          <div className="elon-form-group">
             <label>Xarita havolasi yoki koordinatalar (Google/Yandex map)</label>
             <input
               type="text"
@@ -4905,7 +4868,9 @@ function Contact({ site, page, t, lang, user, onNavigate }) {
   };
 
   const items = contactData.items || site.contact?.items || [];
-  const cardItems = items.filter((item) => item.icon !== "map");
+  const cardItems = items.filter(
+    (item) => item.icon !== "map" && item.icon !== "bank" && !item.title.toLowerCase().includes("hisob")
+  );
   const mapItem = items.find((item) => item.icon === "map");
   const mapUrl = mapItem?.value || contactData.map || site.contact?.map || "";
   const pageTitle = page?.title || t.contactTitle;
@@ -4919,8 +4884,6 @@ function Contact({ site, page, t, lang, user, onNavigate }) {
         return Mail;
       case "clock":
         return Clock3;
-      case "bank":
-        return BriefcaseBusiness;
       case "address":
         return MapPin;
       default:
@@ -4934,7 +4897,6 @@ function Contact({ site, page, t, lang, user, onNavigate }) {
   ).filter(Boolean);
   const email = contactData.email || site.contact?.email || "";
   const hours = contactData.hours || site.contact?.hours || "";
-  const bank = contactData.bank || site.contact?.bank || "";
   const address = contactData.address || site.contact?.address || "";
 
   return (
@@ -4951,7 +4913,7 @@ function Contact({ site, page, t, lang, user, onNavigate }) {
             <div>
               <h3 className="elon-toolbar-title">Aloqa ma'lumotlarini boshqarish</h3>
               <p className="elon-toolbar-desc">
-                Sizga telefon raqamlar, email, ish vaqti, manzil, bank rekvizitlari va xaritani tahrirlash huquqi berilgan.
+                Sizga telefon raqamlar, email, ish vaqti, manzil va xaritani tahrirlash huquqi berilgan.
               </p>
             </div>
           </div>
@@ -5016,7 +4978,6 @@ function Contact({ site, page, t, lang, user, onNavigate }) {
               {phones.length > 0 && <InfoCard icon={Phone} title={t.phones} lines={phones} />}
               {email && <InfoCard icon={Mail} title={t.email} lines={[email]} />}
               {hours && <InfoCard icon={Clock3} title={t.workHours} lines={[hours]} />}
-              {bank && <InfoCard icon={BriefcaseBusiness} title={t.bankDetails} lines={[bank]} />}
               {address && <InfoCard icon={MapPin} title={t.address} lines={[address]} />}
             </>
           )}

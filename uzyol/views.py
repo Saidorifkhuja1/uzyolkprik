@@ -39,10 +39,30 @@ def _settings_payload(settings):
     else:
         plant_url = settings.plant_image_url
 
-    contact_items = list(ContactItem.objects.filter(is_active=True).order_by("order", "id"))
+    try:
+        # Bank / hisob-raqam elementlarini butunlay olib tashlash
+        ContactItem.objects.filter(icon="bank").delete()
+        ContactItem.objects.filter(title__icontains="hisob").delete()
+
+        if ContactItem.objects.count() == 0:
+            phones = [p for p in (settings.phone_primary, settings.phone_secondary) if p]
+            phones_val = "\n".join(phones) if phones else "+998 55 515 16 16\n+998 95 144 68 50"
+            ContactItem.objects.create(title="Telefon raqamlar", value=phones_val, icon="phone", order=1, is_active=True)
+            email_val = settings.email or "ozyolkoprik@gmail.com"
+            ContactItem.objects.create(title="E-pochtamiz", value=email_val, icon="email", order=2, is_active=True)
+            hours_val = settings.hours or "09:00 dan 18:00 gacha"
+            ContactItem.objects.create(title="Ish vaqti", value=hours_val, icon="clock", order=3, is_active=True)
+            addr_val = settings.address or "Toshkent shahri, Yashnobod tumani, Oʻrta Masjid MFY, Ohangrabo koʻchasi 12-uy 100146"
+            ContactItem.objects.create(title="Joylashuv manzili", value=addr_val, icon="address", order=4, is_active=True)
+            map_val = settings.map_url or "https://www.google.com/maps?q=41.251234,69.354249&output=embed&z=17&hl=uz"
+            ContactItem.objects.create(title="Joylashuv xaritasi", value=map_val, icon="map", order=5, is_active=True)
+        contact_items = list(ContactItem.objects.filter(is_active=True).exclude(icon="bank").order_by("order", "id"))
+    except Exception:
+        contact_items = []
+
     email = settings.email or ""
     hours = settings.hours or ""
-    bank = settings.bank or ""
+    bank = ""
     address = settings.address or ""
     map_url = settings.map_url or ""
     phone_list = [p for p in (settings.phone_primary, settings.phone_secondary) if p]
@@ -52,8 +72,6 @@ def _settings_payload(settings):
             email = ci.value.strip()
         elif ci.icon == "clock" and ci.value.strip():
             hours = ci.value.strip()
-        elif ci.icon == "bank" and ci.value.strip():
-            bank = ci.value.strip()
         elif ci.icon == "address" and ci.value.strip():
             address = ci.value.strip()
         elif ci.icon == "map" and ci.value.strip():
@@ -73,6 +91,7 @@ def _settings_payload(settings):
             "order": ci.order,
         }
         for ci in contact_items
+        if ci.icon != "bank" and "hisob" not in ci.title.lower()
     ]
 
     return {
@@ -1413,7 +1432,7 @@ def contact_settings_update(request):
             "phone_primary": settings_obj.phone_primary or "",
             "phone_secondary": settings_obj.phone_secondary or "",
             "email": settings_obj.email or "",
-            "bank": settings_obj.bank or "",
+            "bank": "",
             "address": settings_obj.address or "",
             "hours": settings_obj.hours or "",
             "map": settings_obj.map_url or "",
@@ -1428,8 +1447,6 @@ def contact_settings_update(request):
         settings_obj.phone_secondary = request.data.get("phone_secondary", "").strip()
     if "email" in request.data:
         settings_obj.email = request.data.get("email", "").strip()
-    if "bank" in request.data:
-        settings_obj.bank = request.data.get("bank", "").strip()
     if "address" in request.data:
         settings_obj.address = request.data.get("address", "").strip()
     if "hours" in request.data:
@@ -1437,15 +1454,34 @@ def contact_settings_update(request):
     if "map" in request.data:
         settings_obj.map_url = request.data.get("map", "").strip()
 
+    settings_obj.bank = ""
     settings_obj.save()
 
     phones = [p for p in (settings_obj.phone_primary, settings_obj.phone_secondary) if p]
+
+    # ContactItem larni ham sinxron yangilash
+    try:
+        ContactItem.objects.filter(icon="bank").delete()
+        ContactItem.objects.filter(title__icontains="hisob").delete()
+        if phones:
+            ContactItem.objects.filter(icon="phone").update(value="\n".join(phones))
+        if settings_obj.email:
+            ContactItem.objects.filter(icon="email").update(value=settings_obj.email)
+        if settings_obj.hours:
+            ContactItem.objects.filter(icon="clock").update(value=settings_obj.hours)
+        if settings_obj.address:
+            ContactItem.objects.filter(icon="address").update(value=settings_obj.address)
+        if settings_obj.map_url:
+            ContactItem.objects.filter(icon="map").update(value=settings_obj.map_url)
+    except Exception:
+        pass
+
     return Response({
         "phones": phones,
         "phone_primary": settings_obj.phone_primary or "",
         "phone_secondary": settings_obj.phone_secondary or "",
         "email": settings_obj.email or "",
-        "bank": settings_obj.bank or "",
+        "bank": "",
         "address": settings_obj.address or "",
         "hours": settings_obj.hours or "",
         "map": settings_obj.map_url or "",
