@@ -19,6 +19,7 @@ from .models import (
     Page,
     SiteSettings,
     ElonlarProduct,
+    ContactItem,
 )
 from .serializers import ErrorSerializer, PageSerializer, PagesResponseSerializer, SitePayloadSerializer
 
@@ -38,7 +39,42 @@ def _settings_payload(settings):
     else:
         plant_url = settings.plant_image_url
 
-    phones = [phone for phone in (settings.phone_primary, settings.phone_secondary) if phone]
+    contact_items = list(ContactItem.objects.filter(is_active=True).order_by("order", "id"))
+    email = settings.email or ""
+    hours = settings.hours or ""
+    bank = settings.bank or ""
+    address = settings.address or ""
+    map_url = settings.map_url or ""
+    phone_list = [p for p in (settings.phone_primary, settings.phone_secondary) if p]
+
+    for ci in contact_items:
+        if ci.icon == "email" and ci.value.strip():
+            email = ci.value.strip()
+        elif ci.icon == "clock" and ci.value.strip():
+            hours = ci.value.strip()
+        elif ci.icon == "bank" and ci.value.strip():
+            bank = ci.value.strip()
+        elif ci.icon == "address" and ci.value.strip():
+            address = ci.value.strip()
+        elif ci.icon == "map" and ci.value.strip():
+            map_url = ci.value.strip()
+        elif ci.icon == "phone" and ci.value.strip():
+            p_lines = [p.strip() for p in ci.value.split("\n") if p.strip()]
+            if p_lines:
+                phone_list = p_lines
+
+    serialized_items = [
+        {
+            "id": ci.id,
+            "title": ci.title,
+            "value": ci.value,
+            "lines": [line.strip() for line in ci.value.split("\n") if line.strip()],
+            "icon": ci.icon,
+            "order": ci.order,
+        }
+        for ci in contact_items
+    ]
+
     return {
         "brand": {
             "name": settings.name,
@@ -57,12 +93,16 @@ def _settings_payload(settings):
             ],
         },
         "contact": {
-            "phones": phones,
-            "email": settings.email,
-            "bank": settings.bank,
-            "address": settings.address,
-            "hours": settings.hours,
-            "map": settings.map_url,
+            "items": serialized_items,
+            "phones": phone_list,
+            "phone_primary": phone_list[0] if len(phone_list) > 0 else (settings.phone_primary or ""),
+            "phone_secondary": phone_list[1] if len(phone_list) > 1 else (settings.phone_secondary or ""),
+            "email": email,
+            "bank": bank,
+            "address": address,
+            "hours": hours,
+            "map": map_url,
+            "image": settings.contact_image_url or "",
         },
     }
 

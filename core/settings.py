@@ -376,6 +376,7 @@ JAZZMIN_SETTINGS = {
         "uzyol.News": "fas fa-newspaper",
         "uzyol.Leader": "fas fa-user-tie",
         "uzyol.Announcement": "fas fa-bullhorn",
+        "uzyol.ContactItem": "fas fa-address-book",
     },
     "default_icon_parents": "fas fa-chevron-circle-right",
     "default_icon_children": "fas fa-circle",

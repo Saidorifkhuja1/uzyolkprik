@@ -442,6 +442,46 @@ class BoshIshOrinlari(Page):
         verbose_name_plural = "Boʻsh ish oʻrinlari"
 
 
+class ContactItem(models.Model):
+    ICON_CHOICES = (
+        ("phone", "Telefon (Phone)"),
+        ("email", "E-pochta (Email)"),
+        ("clock", "Ish vaqti (Work Hours)"),
+        ("bank", "Hisob-raqam / Bank rekvizitlari"),
+        ("address", "Joylashuv manzili (Address)"),
+        ("map", "Joylashuv xaritasi (Google Map)"),
+        ("info", "Boshqa ma'lumot (General Info)"),
+    )
+
+    title = models.CharField(
+        max_length=128,
+        verbose_name="Element nomi / Sarlavhasi",
+        help_text="Masalan: Telefon raqamlar, E-pochtamiz, Ish vaqti, Hisob-raqam, Joylashuv manzili, Joylashuv xaritasi...",
+    )
+    value = models.TextField(
+        verbose_name="Qiymati / Ma'lumot matni",
+        help_text="Telefon raqamlar yoki manzillar bir nechta boʻlsa, har birini yangi qatordan yozing",
+    )
+    icon = models.CharField(
+        max_length=32,
+        choices=ICON_CHOICES,
+        default="info",
+        verbose_name="Ikonka / Turi",
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib raqami")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan vaqti")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Yangilangan vaqti")
+
+    class Meta:
+        verbose_name = "Qayta aloqa elementi"
+        verbose_name_plural = "Qayta aloqa"
+        ordering = ("order", "id")
+
+    def __str__(self):
+        return f"{self.title}: {self.value[:30]}"
+
+
 class QaytaAloqa(Page):
     class Meta:
         proxy = True

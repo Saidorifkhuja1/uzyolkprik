@@ -42,6 +42,7 @@ import {
   Image as ImageIcon,
   Upload,
   Megaphone,
+  Info,
 } from "lucide-react";
 import {
   API_DOCS,
@@ -1579,16 +1580,20 @@ function Header({
             <Building2 size={14} />
             {t.brandLegalName || site.brand.legalName}
           </span>
-          <span className="top-strip-item">
-            <Clock3 size={14} />
-            {t.contactHours || site.contact.hours}
-          </span>
+          {(site.contact?.hours || t.contactHours) && (
+            <span className="top-strip-item">
+              <Clock3 size={14} />
+              {site.contact?.hours || t.contactHours}
+            </span>
+          )}
         </div>
         <div className="top-strip-info">
-          <a href={`mailto:${site.contact.email}`} className="top-strip-item">
-            <Mail size={14} />
-            {site.contact.email}
-          </a>
+          {site.contact?.email && (
+            <a href={`mailto:${site.contact.email}`} className="top-strip-item">
+              <Mail size={14} />
+              {site.contact.email}
+            </a>
+          )}
         </div>
       </div>
 
@@ -1831,7 +1836,7 @@ function PageRenderer({ page, site, onNavigate, t, lang, user }) {
     return <Announcement page={page} t={t} lang={lang} user={user} onNavigate={onNavigate} />;
   }
   if (page.type === "contact" || page.slug === "qayta-aloqa") {
-    return <Contact site={site} t={t} lang={lang} user={user} onNavigate={onNavigate} />;
+    return <Contact site={site} page={page} t={t} lang={lang} user={user} onNavigate={onNavigate} />;
   }
   if (["korxona-ustavi", "tashkiliy-tuzilma", "ishlarimiz", "katalog", "nomenklatura"].includes(page.slug) || page.type === "document") {
     return <DocumentPage page={page} site={site} t={t} lang={lang} user={user} onNavigate={onNavigate} />;
@@ -4682,6 +4687,25 @@ function Announcement({ page, t, lang, user, onNavigate }) {
   );
 }
 
+function getMapSrc(rawMapUrl, lang = "uz") {
+  if (!rawMapUrl || !rawMapUrl.trim()) {
+    return `https://www.google.com/maps?q=41.251234,69.354249&output=embed&z=17&hl=${lang || "uz"}`;
+  }
+  const url = rawMapUrl.trim();
+  const iframeMatch = url.match(/src=["']([^"']+)["']/i);
+  if (iframeMatch) {
+    return iframeMatch[1];
+  }
+  if (/^[-+]?([1-8]?\d(\.\d+)?|90(\.0+)?),\s*[-+]?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/.test(url)) {
+    return `https://www.google.com/maps?q=${encodeURIComponent(url)}&output=embed&z=17&hl=${lang || "uz"}`;
+  }
+  if (url.includes("google.com/maps") && !url.includes("output=embed") && !url.includes("/embed")) {
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}output=embed`;
+  }
+  return url;
+}
+
 function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
   const [phone1, setPhone1] = useState(contact.phones?.[0] || contact.phone_primary || "");
   const [phone2, setPhone2] = useState(contact.phones?.[1] || contact.phone_secondary || "");
@@ -4689,8 +4713,19 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
   const [hours, setHours] = useState(contact.hours || "");
   const [bank, setBank] = useState(contact.bank || "");
   const [address, setAddress] = useState(contact.address || "");
+  const [mapUrl, setMapUrl] = useState(contact.map || contact.map_url || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    setPhone1(contact.phones?.[0] || contact.phone_primary || "");
+    setPhone2(contact.phones?.[1] || contact.phone_secondary || "");
+    setEmail(contact.email || "");
+    setHours(contact.hours || "");
+    setBank(contact.bank || "");
+    setAddress(contact.address || "");
+    setMapUrl(contact.map || contact.map_url || "");
+  }, [contact]);
 
   if (!isOpen) return null;
 
@@ -4706,6 +4741,7 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
         hours: hours.trim(),
         bank: bank.trim(),
         address: address.trim(),
+        map: mapUrl.trim(),
       });
       onClose();
     } catch (err) {
@@ -4746,7 +4782,7 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
                 value={phone1}
                 onChange={(e) => setPhone1(e.target.value)}
                 className="elon-form-input"
-                placeholder="+998 71 123 45 67"
+                placeholder="+998 55 515 16 16"
               />
             </div>
             <div className="elon-form-group" style={{ flex: 1 }}>
@@ -4756,7 +4792,7 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
                 value={phone2}
                 onChange={(e) => setPhone2(e.target.value)}
                 className="elon-form-input"
-                placeholder="+998 71 765 43 21"
+                placeholder="+998 95 144 68 50"
               />
             </div>
           </div>
@@ -4768,7 +4804,7 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="elon-form-input"
-              placeholder="info@uzyolkoprik.uz"
+              placeholder="ozyolkoprik@gmail.com"
             />
           </div>
 
@@ -4779,18 +4815,7 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
               value={hours}
               onChange={(e) => setHours(e.target.value)}
               className="elon-form-input"
-              placeholder="Dushanba - Juma: 09:00 - 18:00"
-            />
-          </div>
-
-          <div className="elon-form-group">
-            <label>Bank rekvizitlari</label>
-            <textarea
-              value={bank}
-              onChange={(e) => setBank(e.target.value)}
-              rows={3}
-              className="elon-form-textarea"
-              placeholder="H/r, MFO, INN, Bank nomi..."
+              placeholder="09:00 dan 18:00 gacha"
             />
           </div>
 
@@ -4801,7 +4826,29 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
               onChange={(e) => setAddress(e.target.value)}
               rows={2}
               className="elon-form-textarea"
-              placeholder="Toshkent sh., ..."
+              placeholder="Toshkent shahri, Yashnobod tumani, Oʻrta Masjid MFY, Ohangrabo koʻchasi 12-uy 100146"
+            />
+          </div>
+
+          <div className="elon-form-group">
+            <label>Bank rekvizitlari</label>
+            <textarea
+              value={bank}
+              onChange={(e) => setBank(e.target.value)}
+              rows={3}
+              className="elon-form-textarea"
+              placeholder="Oʻzbekiston Respublikasi TIF Milliy bank Bektemir tumani filiali BIK 00450 STIR 200 836 188"
+            />
+          </div>
+
+          <div className="elon-form-group">
+            <label>Xarita havolasi yoki koordinatalar (Google/Yandex map)</label>
+            <input
+              type="text"
+              value={mapUrl}
+              onChange={(e) => setMapUrl(e.target.value)}
+              className="elon-form-input"
+              placeholder="https://www.google.com/maps?... yoki 41.251234, 69.354249"
             />
           </div>
 
@@ -4829,7 +4876,7 @@ function ContactEditModal({ isOpen, contact, onClose, onSave, t }) {
   );
 }
 
-function Contact({ site, t, lang, user, onNavigate }) {
+function Contact({ site, page, t, lang, user, onNavigate }) {
   const canManage = Boolean(user && (user.is_superuser || user.permissions?.can_edit_contact));
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [contactData, setContactData] = useState(site.contact || {});
@@ -4851,16 +4898,48 @@ function Contact({ site, t, lang, user, onNavigate }) {
       hours: updated.hours,
       bank: updated.bank,
       address: updated.address,
+      map: updated.map,
     }));
     setSuccessMsg("Aloqa ma'lumotlari muvaffaqiyatli saqlandi!");
     setTimeout(() => setSuccessMsg(null), 3500);
   };
 
-  const phones = contactData.phones?.length ? contactData.phones : [contactData.phone_primary || "+998 71 200 00 00"];
+  const items = contactData.items || site.contact?.items || [];
+  const cardItems = items.filter((item) => item.icon !== "map");
+  const mapItem = items.find((item) => item.icon === "map");
+  const mapUrl = mapItem?.value || contactData.map || site.contact?.map || "";
+  const pageTitle = page?.title || t.contactTitle;
+  const pageLabel = page?.subtitle || t.contactLabel;
+
+  const getCardIcon = (iconType) => {
+    switch (iconType) {
+      case "phone":
+        return Phone;
+      case "email":
+        return Mail;
+      case "clock":
+        return Clock3;
+      case "bank":
+        return BriefcaseBusiness;
+      case "address":
+        return MapPin;
+      default:
+        return Info;
+    }
+  };
+
+  const phones = (contactData.phones?.length
+    ? contactData.phones
+    : [contactData.phone_primary, contactData.phone_secondary]
+  ).filter(Boolean);
+  const email = contactData.email || site.contact?.email || "";
+  const hours = contactData.hours || site.contact?.hours || "";
+  const bank = contactData.bank || site.contact?.bank || "";
+  const address = contactData.address || site.contact?.address || "";
 
   return (
     <section className="page-shell">
-      <PageHero title={t.contactTitle} label={t.contactLabel} />
+      <PageHero title={pageTitle} label={pageLabel} />
 
       {/* Admin Toolbar for can_edit_contact */}
       {canManage && (
@@ -4872,7 +4951,7 @@ function Contact({ site, t, lang, user, onNavigate }) {
             <div>
               <h3 className="elon-toolbar-title">Aloqa ma'lumotlarini boshqarish</h3>
               <p className="elon-toolbar-desc">
-                Sizga telefon raqamlar, email, ish vaqti, manzil va bank rekvizitlarini tahrirlash huquqi berilgan.
+                Sizga telefon raqamlar, email, ish vaqti, manzil, bank rekvizitlari va xaritani tahrirlash huquqi berilgan.
               </p>
             </div>
           </div>
@@ -4894,18 +4973,58 @@ function Contact({ site, t, lang, user, onNavigate }) {
         </div>
       )}
 
+      {page?.image && (
+        <div style={{ marginBottom: 28, borderRadius: 12, overflow: "hidden", maxHeight: 360 }}>
+          <img
+            src={page.image}
+            alt={pageTitle}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
+      )}
+
+      {page?.content && (
+        <div
+          className="glass-panel"
+          style={{
+            padding: "20px 24px",
+            marginBottom: 28,
+            borderRadius: 12,
+            fontSize: 16,
+            lineHeight: 1.6,
+            color: "var(--text-primary)",
+            whiteSpace: "pre-line",
+          }}
+        >
+          {page.content}
+        </div>
+      )}
+
       <div className="contact-layout">
         <div className="contact-cards">
-          <InfoCard icon={Phone} title={t.phones} lines={phones} />
-          <InfoCard icon={Mail} title={t.email} lines={[contactData.email || site.contact?.email || "info@uzyolkoprik.uz"]} />
-          <InfoCard icon={Clock3} title={t.workHours} lines={[contactData.hours || t.contactHours || site.contact?.hours || "09:00 - 18:00"]} />
-          <InfoCard icon={BriefcaseBusiness} title={t.bankDetails} lines={[contactData.bank || t.bankText || site.contact?.bank || ""]} />
-          <InfoCard icon={MapPin} title={t.address} lines={[contactData.address || t.addressText || site.contact?.address || ""]} />
+          {cardItems.length > 0 ? (
+            cardItems.map((item) => (
+              <InfoCard
+                key={item.id || item.title}
+                icon={getCardIcon(item.icon)}
+                title={item.title}
+                lines={item.lines && item.lines.length ? item.lines : [item.value]}
+              />
+            ))
+          ) : (
+            <>
+              {phones.length > 0 && <InfoCard icon={Phone} title={t.phones} lines={phones} />}
+              {email && <InfoCard icon={Mail} title={t.email} lines={[email]} />}
+              {hours && <InfoCard icon={Clock3} title={t.workHours} lines={[hours]} />}
+              {bank && <InfoCard icon={BriefcaseBusiness} title={t.bankDetails} lines={[bank]} />}
+              {address && <InfoCard icon={MapPin} title={t.address} lines={[address]} />}
+            </>
+          )}
         </div>
         <div className="map-panel">
           <iframe
             title={t.mapTitle}
-            src={`https://www.google.com/maps?q=41.251234,69.354249&output=embed&z=17&hl=${lang || "uz"}`}
+            src={getMapSrc(mapUrl, lang)}
             loading="lazy"
             allowFullScreen
             referrerPolicy="no-referrer-when-downgrade"
@@ -4916,7 +5035,7 @@ function Contact({ site, t, lang, user, onNavigate }) {
 
       <ContactEditModal
         isOpen={isEditOpen}
-        contact={contactData}
+        contact={{ ...contactData, map: mapUrl }}
         onClose={() => setIsEditOpen(false)}
         onSave={handleSaveContact}
         t={t}
@@ -4956,10 +5075,6 @@ function Footer({ site, onNavigate, t }) {
       <div className="footer-brand">
         <strong>{t.brandLegalName || site.brand.legalName}</strong>
         <p>{t.heroTagline || site.brand.tagline}</p>
-        <div className="footer-links">
-          <a href={API_DOCS.swagger} target="_blank" rel="noreferrer">API (Swagger)</a>
-          <a href={API_DOCS.redoc} target="_blank" rel="noreferrer">API (ReDoc)</a>
-        </div>
       </div>
       <button className="btn-primary" onClick={() => onNavigate("qayta-aloqa")}>
         <Mail size={16} />

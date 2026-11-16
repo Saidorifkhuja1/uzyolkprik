@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from django.db import models
 from django.forms.widgets import ClearableFileInput
 
@@ -20,6 +21,7 @@ from .models import (
     NarxNavoProduct,
     ElonlarProduct,
     BoshIshOrinlariProduct,
+    ContactItem,
     QaytaAloqa,
     FilialItem,
     KatalogItem,
@@ -364,9 +366,68 @@ class NarxNavoProductAdmin(admin.ModelAdmin):
     }
 
 
-@admin.register(QaytaAloqa)
-class QaytaAloqaAdmin(BaseSinglePageAdmin):
-    target_slug = "qayta-aloqa"
+@admin.register(ContactItem)
+class ContactItemAdmin(admin.ModelAdmin):
+    list_display = ("title", "icon_badge", "short_value", "order", "is_active", "updated_at")
+    list_editable = ("order", "is_active")
+    list_filter = ("icon", "is_active")
+    search_fields = ("title", "value")
+    ordering = ("order", "id")
+    list_per_page = 50
+    fieldsets = (
+        ("Element maʼlumotlari", {
+            "fields": ("title", "value", "icon", "order", "is_active"),
+            "description": "Ushbu maʼlumot saytning 'Qayta aloqa' boʻlimidagi kartochka yoki xarita sifatida koʻrsatiladi.",
+        }),
+    )
+
+    def short_value(self, obj):
+        val = obj.value.strip().replace("\n", " | ")
+        if len(val) > 70:
+            return val[:67] + "..."
+        return val
+    short_value.short_description = "Maʼlumot / Qiymati"
+
+    def icon_badge(self, obj):
+        from django.utils.html import format_html
+        labels = {
+            "phone": ("Telefon", "#0ea5e9"),
+            "email": ("E-pochta", "#10b981"),
+            "clock": ("Ish vaqti", "#f59e0b"),
+            "bank": ("Hisob-raqam", "#8b5cf6"),
+            "address": ("Joylashuv manzili", "#ec4899"),
+            "map": ("Xarita", "#06b6d4"),
+            "info": ("Boshqa", "#64748b"),
+        }
+        text, color = labels.get(obj.icon, (obj.icon, "#64748b"))
+        return format_html(
+            '<span style="background-color: {}; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 600;">{}</span>',
+            color,
+            text,
+        )
+    icon_badge.short_description = "Turi"
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        s = SiteSettings.objects.first()
+        if s and obj.is_active:
+            if obj.icon == "email":
+                s.email = obj.value.strip()
+            elif obj.icon == "phone":
+                lines = [p.strip() for p in obj.value.split("\n") if p.strip()]
+                if len(lines) > 0:
+                    s.phone_primary = lines[0]
+                if len(lines) > 1:
+                    s.phone_secondary = lines[1]
+            elif obj.icon == "clock":
+                s.hours = obj.value.strip()
+            elif obj.icon == "bank":
+                s.bank = obj.value.strip()
+            elif obj.icon == "address":
+                s.address = obj.value.strip()
+            elif obj.icon == "map":
+                s.map_url = obj.value.strip()
+            s.save()
 
 
 @admin.register(Leader)
