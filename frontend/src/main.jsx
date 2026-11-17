@@ -1323,9 +1323,15 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
-  // Theme: dark (default) | light
+  // Theme: light (default) | dark
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("uz_theme") || "dark";
+    const migrated = localStorage.getItem("uz_theme_default_light_v1");
+    if (!migrated) {
+      localStorage.setItem("uz_theme_default_light_v1", "1");
+      localStorage.setItem("uz_theme", "light");
+      return "light";
+    }
+    return localStorage.getItem("uz_theme") || "light";
   });
 
   // Language: uz (default) | ru | en
